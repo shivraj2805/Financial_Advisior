@@ -1,2 +1,1 @@
-# Intership_College
-# aashish
+# Shivraj Darekar
