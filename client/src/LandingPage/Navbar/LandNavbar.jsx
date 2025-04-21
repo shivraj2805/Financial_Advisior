@@ -31,7 +31,15 @@ export const LandNavbar = () => {
             </span>
           </div>
       <ul>
+
+        <SignedOut>
         <li><Link to="hero" smooth={true} offset={0} duration={500}>Home</Link></li>
+        </SignedOut>
+        
+        <SignedIn>
+        <li><a href='/financialAdvisior' smooth={true} offset={0} duration={500}>Dashboard</a></li>
+        </SignedIn> 
+
         <li><Link to="program" smooth={true} offset={-260} duration={500}>Program</Link></li>
         <li><Link to="about" smooth={true} offset={-150} duration={500}>About us</Link></li>
         <li><Link to="testimonials" smooth={true} offset={-260} duration={500}>Testimonials</Link></li>

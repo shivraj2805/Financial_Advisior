@@ -26,12 +26,23 @@ const NavBar = ({ language, toggleLanguage }) => {
 
           {/* Right: Navigation Links */}
           <div className="hidden md:flex items-center space-x-8 inline-block list-none mx-5 text-[rgb(6,86,6)] text-[18px] font-medium transition duration-500 cursor-pointer font-[Outfit]">
-            <a
+           <SignedOut>
+           <a
               href="/"
               className="text-green-800  hover:text-blue-900 transition-colors"
             >
               Home
             </a>
+           </SignedOut>
+
+           <SignedIn>
+           <a
+              href="/financialAdvisior"
+              className="text-green-800  hover:text-blue-900 transition-colors"
+            >
+              Dashboard
+            </a>
+           </SignedIn>
             <a
               href="/ppf"
               className="text-green-800 hover:text-blue-900 transition-colors"
