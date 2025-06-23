@@ -2,7 +2,7 @@ import axios from "axios";
 import { useHistory } from "react-router-dom"; // Assuming you're using react-router
 
 const axiosInstance = axios.create({
-  baseURL: "https://intership-college.onrender.com/",
+  baseURL: `process.env.BACKEND_URL`,
 });
 
 axiosInstance.interceptors.request.use((config) => {

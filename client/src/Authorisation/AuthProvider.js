@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }) => {
       if (token) {
         try {
           const response = await axios.get(
-            "http://localhost:8080/api/auth/verify",
+            `process.env.BACKEND_URL/api/auth/verify`,
             {
               headers: { Authorization: `Bearer ${token}` },
             }
