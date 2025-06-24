@@ -22,7 +22,7 @@ export default function FinancialAdvisorChatbotUi() {
   const [formValid, setFormValid] = useState(false);
 
   useEffect(() => {
-    fetch(`https://financial-advisior.onrender.com/api/business-types`)
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/business-types`)
       .then((response) => response.json())
       .then((data) => setBusinessTypes(data.business_types))
       .catch((error) => console.error("Error fetching business types:", error));
@@ -47,11 +47,8 @@ export default function FinancialAdvisorChatbotUi() {
     setLoading(true);
     setAdvice(null);
 
-   
-    // ${process.env.REACT_APP_BACKEND_URL}
-
     try {
-      const response = await fetch(`https://financial-advisior.onrender.com/api/financial-advice/generate`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/financial-advice/generate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
