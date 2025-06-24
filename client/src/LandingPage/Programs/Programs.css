@@ -55,3 +55,23 @@
     height: 300px;
 }
 
+@media (max-width: 768px) {
+  .programs {
+    flex-direction: column;
+    gap: 24px;
+    width: 98%;
+    padding: 0 8px;
+  }
+  .program {
+    flex-basis: 100%;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  .program img,
+  .img2,
+  .img3 {
+    height: 180px !important;
+    width: 100%;
+    object-fit: cover;
+  }
+}

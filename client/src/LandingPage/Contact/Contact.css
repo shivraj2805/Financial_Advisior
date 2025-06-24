@@ -58,3 +58,17 @@
     display: block;
     margin: 20px 0;
 }
+
+@media (max-width: 768px) {
+  .contact {
+    flex-direction: column;
+    gap: 24px;
+    max-width: 98%;
+    padding: 0 8px;
+  }
+  .contact-col {
+    flex-basis: 100%;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+}

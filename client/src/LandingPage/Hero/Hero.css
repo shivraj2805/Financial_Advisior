@@ -42,3 +42,17 @@
     line-height: 1.4;
 
 }
+
+@media (max-width: 768px) {
+  .hero .hero-text .main-head,
+  .hero-text h1 {
+    font-size: 32px;
+  }
+  .hero .hero-text .sub-head {
+    font-size: 15px;
+  }
+  .hero-text {
+    max-width: 98vw;
+    padding: 0 8px;
+  }
+}

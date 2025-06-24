@@ -54,3 +54,15 @@ a{
         padding: 14px 22px;
     }
 }
+
+@media (max-width: 768px) {
+  .landing-page {
+    padding: 0 8px;
+    width: 100vw;
+    overflow-x: hidden;
+  }
+  .section {
+    margin: 24px 0;
+    padding: 0;
+  }
+}
