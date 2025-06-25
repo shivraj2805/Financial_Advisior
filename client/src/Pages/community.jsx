@@ -4,6 +4,8 @@ import { useUser } from '@clerk/clerk-react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+const API = process.env.REACT_APP_BACKEND_URL;
+
 const getInitials = (name = "") =>
   name
     .split(" ")
@@ -17,13 +19,13 @@ const CommunityChat = ({ communityId, userId, userName }) => {
   const [input, setInput] = useState('');
 
   useEffect(() => {
-    axios.get(`/api/communities/${communityId}/messages`)
+    axios.get(`${API}/api/communities/${communityId}/messages`)
       .then(res => setMessages(res.data));
   }, [communityId]);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
-    const res = await axios.post(`/api/communities/${communityId}/messages`, { userId, userName, text: input });
+    const res = await axios.post(`${API}/api/communities/${communityId}/messages`, { userId, userName, text: input });
     setMessages([...messages, res.data]);
     setInput('');
   };
@@ -69,7 +71,7 @@ const CommunityForm = ({ onCreate, userId }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('/api/communities', { name, description, owner: userId });
+      const res = await axios.post(`${API}/api/communities`, { name, description, owner: userId });
       onCreate(res.data);
       setName('');
       setDescription('');
@@ -110,7 +112,7 @@ const DiscussionForums = () => {
   const [activeChat, setActiveChat] = useState(null);
 
   useEffect(() => {
-    axios.get('/api/communities').then(res => setCommunities(res.data));
+    axios.get(`${API}/api/communities`).then(res => setCommunities(res.data));
   }, []);
 
   useEffect(() => {
@@ -129,7 +131,7 @@ const DiscussionForums = () => {
       toast.info('Please sign in to join a community.');
       return;
     }
-    await axios.post(`/api/communities/${id}/join`, { userId });
+    await axios.post(`${API}/api/communities/${id}/join`, { userId });
     setCommunities(communities =>
       communities.map(forum =>
         forum._id === id
@@ -142,7 +144,7 @@ const DiscussionForums = () => {
   };
 
   const handleLeave = async (id) => {
-    await axios.post(`/api/communities/${id}/leave`, { userId });
+    await axios.post(`${API}/api/communities/${id}/leave`, { userId });
     setCommunities(communities =>
       communities.map(forum =>
         forum._id === id
@@ -159,7 +161,7 @@ const DiscussionForums = () => {
   };
 
   const handleDelete = async (id) => {
-    await axios.delete(`/api/communities/${id}`, { data: { userId } });
+    await axios.delete(`${API}/api/communities/${id}`, { data: { userId } });
     setCommunities(communities.filter(forum => forum._id !== id));
     setActiveChat(null);
     toast.success('Forum deleted!');
@@ -170,82 +172,82 @@ const DiscussionForums = () => {
   const notJoinedCommunities = communities.filter(forum => !joined.has(forum._id));
 
   // Card rendering function
- const renderForumCard = (forum, isJoined, modalMode = false) => {
-  if (!forum) return null;
-  const isActive = activeChat === forum._id;
-  return (
-    <div
-      key={forum._id}
-      className={`bg-white rounded-2xl shadow-xl p-7 flex flex-col justify-between border border-green-100
-        hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 relative overflow-hidden group
-        ${modalMode ? 'ring-2 ring-green-400 scale-105 z-50 min-w-[350px] max-w-lg w-full' : 'min-h-[220px]'}`}
-      style={modalMode ? { maxWidth: 500, width: '100%' } : {}}
-    >
-      {/* Close icon for modal mode */}
-      {modalMode && (
-        <button
-          className="absolute top-4 right-4 bg-white rounded-full shadow p-1 hover:bg-gray-100 z-10"
-          onClick={() => setActiveChat(null)}
-          aria-label="Close Chat"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      )}
-      <span className="absolute inset-0 pointer-events-none rounded-2xl group-hover:bg-gradient-to-tr group-hover:from-green-100 group-hover:to-green-50 group-hover:opacity-80 transition-all duration-300"></span>
-      <div className="flex items-center gap-4 mb-4 relative z-10">
-        <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-xl shadow">
-          {getInitials(forum.name)}
-        </div>
-        <div>
-          <h3 className="text-2xl font-semibold text-green-800 mb-1">{forum.name}</h3>
-          <p className="text-gray-600">{forum.description}</p>
-        </div>
-      </div>
-      <div className="flex flex-col gap-2 mt-4 relative z-10">
-        {isJoined ? (
-          <>
-            <div className="flex gap-2 flex-wrap">
-              <button
-                className="relative overflow-hidden bg-green-100 hover:bg-green-200 text-green-800 px-4 py-2 rounded transition font-semibold shadow-sm"
-                onClick={() => handleLeave(forum._id)}
-              >
-                Leave Forum
-              </button>
-              {!modalMode && (
-                <button
-                  className="relative overflow-hidden bg-blue-100 hover:bg-blue-200 text-blue-800 px-4 py-2 rounded transition font-semibold shadow-sm"
-                  onClick={() => setActiveChat(forum._id)}
-                >
-                  Open Chat
-                </button>
-              )}
-              {userId === forum.owner && (
-                <button
-                  className="relative overflow-hidden bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition font-semibold shadow-sm"
-                  onClick={() => handleDelete(forum._id)}
-                >
-                  Delete Forum
-                </button>
-              )}
-            </div>
-            {modalMode && isActive && (
-              <CommunityChat communityId={forum._id} userId={userId} userName={userName} />
-            )}
-          </>
-        ) : (
+  const renderForumCard = (forum, isJoined, modalMode = false) => {
+    if (!forum) return null;
+    const isActive = activeChat === forum._id;
+    return (
+      <div
+        key={forum._id}
+        className={`bg-white rounded-2xl shadow-xl p-7 flex flex-col justify-between border border-green-100
+          hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 relative overflow-hidden group
+          ${modalMode ? 'ring-2 ring-green-400 scale-105 z-50 min-w-[350px] max-w-lg w-full' : 'min-h-[220px]'}`}
+        style={modalMode ? { maxWidth: 500, width: '100%' } : {}}
+      >
+        {/* Close icon for modal mode */}
+        {modalMode && (
           <button
-            className="relative overflow-hidden bg-gradient-to-r from-green-500 to-green-700 hover:from-green-600 hover:to-green-800 text-white px-4 py-2 rounded transition font-bold shadow"
-            onClick={() => handleJoin(forum._id)}
+            className="absolute top-4 right-4 bg-white rounded-full shadow p-1 hover:bg-gray-100 z-10"
+            onClick={() => setActiveChat(null)}
+            aria-label="Close Chat"
           >
-            Join Forum
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </button>
         )}
+        <span className="absolute inset-0 pointer-events-none rounded-2xl group-hover:bg-gradient-to-tr group-hover:from-green-100 group-hover:to-green-50 group-hover:opacity-80 transition-all duration-300"></span>
+        <div className="flex items-center gap-4 mb-4 relative z-10">
+          <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-xl shadow">
+            {getInitials(forum.name)}
+          </div>
+          <div>
+            <h3 className="text-2xl font-semibold text-green-800 mb-1">{forum.name}</h3>
+            <p className="text-gray-600">{forum.description}</p>
+          </div>
+        </div>
+        <div className="flex flex-col gap-2 mt-4 relative z-10">
+          {isJoined ? (
+            <>
+              <div className="flex gap-2 flex-wrap">
+                <button
+                  className="relative overflow-hidden bg-green-100 hover:bg-green-200 text-green-800 px-4 py-2 rounded transition font-semibold shadow-sm"
+                  onClick={() => handleLeave(forum._id)}
+                >
+                  Leave Forum
+                </button>
+                {!modalMode && (
+                  <button
+                    className="relative overflow-hidden bg-blue-100 hover:bg-blue-200 text-blue-800 px-4 py-2 rounded transition font-semibold shadow-sm"
+                    onClick={() => setActiveChat(forum._id)}
+                  >
+                    Open Chat
+                  </button>
+                )}
+                {userId === forum.owner && (
+                  <button
+                    className="relative overflow-hidden bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition font-semibold shadow-sm"
+                    onClick={() => handleDelete(forum._id)}
+                  >
+                    Delete Forum
+                  </button>
+                )}
+              </div>
+              {modalMode && isActive && (
+                <CommunityChat communityId={forum._id} userId={userId} userName={userName} />
+              )}
+            </>
+          ) : (
+            <button
+              className="relative overflow-hidden bg-gradient-to-r from-green-500 to-green-700 hover:from-green-600 hover:to-green-800 text-white px-4 py-2 rounded transition font-bold shadow"
+              onClick={() => handleJoin(forum._id)}
+            >
+              Join Forum
+            </button>
+          )}
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
   return (
     <div className="p-8 bg-gradient-to-br from-green-50 to-white min-h-screen">
       <CommunityForm onCreate={handleCreate} userId={userId} />
