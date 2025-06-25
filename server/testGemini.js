@@ -5,7 +5,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 async function testGemini() {
     try {
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });  // ✅ Correct model name
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });  // ✅ Correct model name
         const response = await model.generateContent("Hello, how are you?");
         
         console.log(await response.response.text());  // ✅ Fetch correct text response

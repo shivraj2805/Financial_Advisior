@@ -48,7 +48,7 @@ const generateFinancialAdvice = async (req, res) => {
                 Take into consideration their income, financial goals,location , business type , existing savings and risk tolerance to recommend suitable investment options, savings plans, and budgeting strategies. Include recommendations for short-term and long-term financial goals, and suggest actions based on their location and preferred language and give advise in prefered language only.
          `;
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
     console.log("Sending request to Gemini API...");
     const result = await model.generateContent([prompt]);
