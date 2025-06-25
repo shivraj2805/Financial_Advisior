@@ -16,16 +16,18 @@ const PORT = process.env.PORT || 8080;
 // Allow both local and production frontend URLs
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://finadvisior.vercel.app"
+  "https://finadvisior.vercel.app",
+  "https://www.finadvisior.vercel.app"
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
-    console.log("Request Origin:", origin); // Add this for debugging
+    console.log("Request Origin:", origin); // For debugging
     if (!origin) return callback(null, true); // Allow non-browser requests
     if (
       allowedOrigins.includes(origin) ||
-      origin?.startsWith("http://localhost")
+      origin?.startsWith("http://localhost") ||
+      /^https:\/\/.*\.finadvisior\.vercel\.app$/.test(origin)
     ) {
       return callback(null, true);
     } else {
