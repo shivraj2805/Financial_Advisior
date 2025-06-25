@@ -1,300 +1,201 @@
-
-
-
-
-import React, { useState } from "react";      
+import React, { useState, useEffect } from "react";
+import { useUser } from "@clerk/clerk-react";
 import women1 from "./women1.webp";
 import women2 from "./women2.jpg";
 import man1 from "./man1.jpg";
 import man2 from "./man2.jpg";
+import defaultStories from "./defaultStories";
+import toast, { Toaster } from "react-hot-toast";
 
+const API_URL = `${process.env.REACT_APP_BACKEND_URL}/api/success-stories`;
+
+const avatarColors = [
+  "bg-green-500",
+  "bg-blue-500",
+  "bg-pink-500",
+  "bg-yellow-500",
+  "bg-purple-500",
+  "bg-orange-500",
+];
+
+function getAvatarColor(name = "") {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash += name.charCodeAt(i);
+  return avatarColors[hash % avatarColors.length];
+}
+
+const featuredStory = {
+  title: "From Small Farm to Thriving Business",
+  author: "Maya Patel",
+  summary:
+    "Maya Patel shares her inspiring journey of transforming a small farm into a successful organic produce business, overcoming financial and operational challenges along the way.",
+  fullStory:
+    "Maya Patel began her journey with just a half-acre plot inherited from her family in rural Gujarat. With limited resources and no formal agricultural training, she faced numerous challenges including poor soil quality, unpredictable weather, and lack of market access. Determined to succeed, Maya researched organic farming techniques online and attended local workshops. She implemented sustainable practices like crop rotation, composting, and rainwater harvesting, which gradually improved her yields. To overcome financial hurdles, she secured a small loan and invested in a drip irrigation system, significantly reducing water costs. Maya then leveraged social media to market her organic vegetables directly to consumers, building a loyal customer base. Within three years, her business expanded to supply organic produce to supermarkets in three nearby cities, employing 15 local workers and inspiring other farmers in her community to adopt organic methods.",
+};
+
+const defaultThumbnails = [women1, women2, man1, man2];
 
 const SuccessStories = () => {
+  const { user } = useUser();
+  const currentUserName =
+    user?.fullName ||
+    user?.username ||
+    user?.primaryEmailAddress?.emailAddress ||
+    user?.emailAddress ||
+    "Unknown User";
+  const currentUserId = user?.id || "";
+
+  const [stories, setStories] = useState([]);
   const [likedStories, setLikedStories] = useState({});
-  const [showFullStory, setShowFullStory] = useState({});
   const [showFeaturedFullStory, setShowFeaturedFullStory] = useState(false);
-  const [filterCriteria, setFilterCriteria] = useState("all"); // Default filter
-  const [videoUrl, setVideoUrl] = useState(null); // State for video URL
+  const [filterCriteria, setFilterCriteria] = useState("all");
+  const [videoUrl, setVideoUrl] = useState(null);
 
-  const stories = [{
-    id: 1,
-    title: "Success sweet like Honey",
-    author: "Avishkar Ghodke",
-    region: "Gujarat",
-    sector: "farming",
-    challenge: "loan-application",
-    thumbnail: man2,
-    views: 1234,
-    likes: 456,
-    date: "March 15, 2025",
-    summary:
-      "How I transformed my 1-acre farm into a successful beekeeping business",
-    fullStory:
-      "Avishkar faced financial difficulties but found innovative ways to sustain beekeeping. By optimizing hive placements and improving honey extraction, he achieved remarkable success.",
-    keyLessons: [
-      "Optimizing hive placement for higher yield",
-      "Identifying and preventing common bee diseases",
-      "Innovative techniques for honey extraction",
-    ],
-    hasVideo: true,
-    videoUrl: "https://www.youtube.com/embed/zMZ6IBCQCm8?si=XqjOE1n3z8Fo5QVK", // Corrected video URL
-  },
-    
-    {
-      id: 2,
-      title: "Building a Women's Dairy Cooperative",
-      author: "Lakshmi Singh",
-      region: "Punjab",
-      sector: "dairy",
-      challenge: "savings",
-      thumbnail: women2,
-      views: 2345,
-      likes: 789,
-      date: "March 10, 2025",
-      summary: "Uniting 50 women to create a successful dairy business",
-      fullStory:
-        "Lakshmi led a group of women to form a cooperative, overcoming economic challenges. Their dairy business is now thriving due to smart financial planning and teamwork.",
-      keyLessons: [
-        "Importance of community collaboration",
-        "Financial planning for cooperatives",
-        "Effective quality control systems",
-      ],
-      hasVideo: true,
-      videoUrl: "https://www.youtube.com/embed/CDU-3XEwsAw?si=ptPCwePBhwvGA3Oc",
-    },
-    {
-      id: 3,
-      title: "Digital Transformation of Traditional Craft",
-      author: "Rajesh Kumar",
-      region: "Rajasthan",
-      sector: "small-business",
-      challenge: "digital-adoption",
-      thumbnail: man1,
-      views: 1567,
-      likes: 234,
-      date: "March 5, 2025",
-      summary:
-        "Taking our family's handicraft business online during the pandemic",
-      fullStory:
-        "Rajesh adapted digital marketing strategies and set up an e-commerce store, ensuring his family’s handicrafts reached a global audience.",
-      keyLessons: [
-        "Digital marketing fundamentals",
-        "E-commerce platform selection",
-        "International shipping logistics",
-      ],
-      hasVideo: true,
-      videoUrl: "https://www.youtube.com/embed/7CCjkqSpSz8?si=24HxB6qC-bO1jmPM",
-    },
-    {
-      id: 4,
-      title: "Innovative Water Conservation Techniques",
-      author: "Suresh Patel",
-      region: "Madhya Pradesh",
-      sector: "farming",
-      challenge: "water-scarcity",
-      thumbnail: man2,
-      views: 987,
-      likes: 123,
-      date: "April 1, 2025",
-      summary: "How I implemented rainwater harvesting in my village",
-      fullStory:
-        "Suresh introduced rainwater harvesting systems in his village, significantly improving water availability for farming and daily use.",
-      keyLessons: [
-        "Importance of water conservation",
-        "Community involvement in sustainable practices",
-        "Simple techniques for rainwater harvesting",
-      ],
-      hasVideo: true,
-      videoUrl: "https://www.youtube.com/embed/-evivoRwUZw?si=7Es1H7NKRKhK21SD",
-    },
-    {
-      id: 5,
-      title: "Empowering Women Through Skill Development",
-      author: "Anjali Verma",
-      region: "Uttar Pradesh",
-      sector: "education",
-      challenge: "skill-development",
-      thumbnail: women1,
-      views: 654,
-      likes: 321,
-      date: "April 15, 2025",
-      summary: "Creating opportunities for women through vocational training",
-      fullStory:
-        "Anjali established a vocational training center for women, helping them gain skills and become financially independent.",
-      keyLessons: [
-        "The role of education in empowerment",
-        "Building community support for women's initiatives",
-        "Effective training programs for skill development",
-      ],
-      hasVideo: true,
-      videoUrl: "https://www.youtube.com/embed/oniEpiAr9-8?si=ssKdtaDh0LV43yID",
-    },
-    {
-      id: 6,
-      title: "Sustainable Farming Practices",
-      author: "Ravi Kumar",
-      region: "Haryana",
-      sector: "farming",
-      challenge: "sustainability",
-      thumbnail: man1,
-      views: 432,
-      likes: 210,
-      date: "May 1, 2025",
-      summary: "Transitioning to organic farming for better yields",
-      fullStory:
-        "Ravi shares his journey of converting his conventional farm to organic, focusing on sustainable practices that benefit the environment.",
-      keyLessons: [
-        "Benefits of organic farming",
-        "Techniques for sustainable agriculture",
-        "Market access for organic products",
-      ],
-      hasVideo: true,
-      videoUrl: "https://www.youtube.com/embed/bPXA8fDcPFE?si=QgUZf500oamSajOO",
-    },
-    {
-      id: 7,
-      title: "Harnessing Solar Energy for Farming",
-      author: "Kiran Mehta",
-      region: "Gujarat",
-      sector: "energy",
-      challenge: "energy-access",
-      thumbnail: man2,
-      views: 800,
-      likes: 150,
-      date: "May 15, 2025",
-      summary: "How solar panels transformed my farm's energy needs",
-      fullStory:
-        "Kiran installed solar panels on his farm, reducing energy costs and promoting sustainable practices.",
-      keyLessons: [
-        "Cost benefits of solar energy",
-        "Sustainable farming practices",
-        "Community impact of renewable energy",
-      ],
-      hasVideo: true,
-      videoUrl: "https://www.youtube.com/embed/6EUaXRzG6cM?si=UF1qOPAHXIrsuWSr",
-    },
-    {
-      id: 8,
-      title: "Creating a Community Garden",
-      author: "Neha Sharma",
-      region: "Delhi",
-      sector: "community",
-      challenge: "food-security",
-      thumbnail: women1,
-      views: 600,
-      likes: 200,
-      date: "June 1, 2025",
-      summary: "Uniting neighbors to grow food and build community",
-      fullStory:
-        "Neha organized a community garden project, fostering relationships and providing fresh produce to local families.",
-      keyLessons: [
-        "Community engagement in food production",
-        "Benefits of local food systems",
-        "Building social connections through gardening",
-      ],
-      hasVideo: true,
-      videoUrl: "https://www.youtube.com/embed/59PiwBaVkmU?si=gFi--h54gE4PRaiM",
-    },
-    {
-      id: 9,
-      title: "Innovative Techniques in Organic Farming",   
-      author: "Vikram Singh",
-      region: "Punjab",
-      sector: "farming",
-      challenge: "organic-certification",
-      thumbnail: man1,
-      views: 700,
-      likes: 180,
-      date: "June 15, 2025",
-      summary: "How I achieved organic certification for my farm",
-      fullStory:
-        "Vikram shares his journey of transitioning to organic farming and the challenges he faced in getting certified.",
-      keyLessons: [
-        "Understanding organic certification",
-        "Techniques for organic farming",
-        "Market opportunities for organic products",
-      ],
-      hasVideo: true,
-      videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-    },
-    {
-      id: 10,
-      title: "Using Technology in Agriculture",
-      author: "Rohit Verma",
-      region: "Madhya Pradesh",
-      sector: "technology",
-      challenge: "agriculture-tech",
-      thumbnail: man2,
-      views: 500,
-      likes: 100,
-      date: "July 1, 2025",
-      summary: "How technology improved my farming practices",
-      fullStory:
-        "Rohit implemented various technologies on his farm, leading to increased efficiency and productivity.",
-      keyLessons: [
-        "Benefits of technology in agriculture",
-        "Adopting new farming techniques",
-        "Improving yield through innovation",
-      ],
-      hasVideo: true,
-      videoUrl: "https://www.youtube.com/embed/V9NAGL-Ji20?si=oc3ZN519TLldxkR0",
-    },
-    {
-      id: 11,
-      title: "Reviving Traditional Farming Methods",
-      author: "Sita Devi",
-      region: "Rajasthan",
-      sector: "farming",
-      challenge: "cultural-preservation",
-      thumbnail: women2,
-      views: 400,
-      likes: 90,
-      date: "July 15, 2025",
-      summary: "How I brought back traditional farming techniques",
-      fullStory:
-        "Sita shares her experience of reviving traditional farming methods that are sustainable and culturally significant.",
-      keyLessons: [
-        "Importance of cultural heritage in farming",
-        "Sustainable practices from the past",
-        "Community involvement in preserving traditions",
-      ],
-      hasVideo: true,
-      videoUrl: "https://www.youtube.com/embed/sOF6lYBZV6w?si=HuQJ44VPiObj3JMV",
-    },
-  ];
+  // Modal state for adding a story
+  const [showModal, setShowModal] = useState(false);
+  const [newStory, setNewStory] = useState({
+    title: "",
+    author: currentUserName,
+    authorId: currentUserId,
+    region: "",
+    sector: "",
+    challenge: "",
+    summary: "",
+    fullStory: "",
+    keyLessons: "",
+    thumbnail: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [formLoading, setFormLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const featuredStory = {
-    title: "From Small Farm to Thriving Business",
-    author: "Maya Patel",
-    summary:
-      "Maya Patel shares her inspiring journey of transforming a small farm into a successful organic produce business, overcoming financial and operational challenges along the way.",
-    fullStory:
-      "Maya Patel began her journey with just a half-acre plot inherited from her family in rural Gujarat. With limited resources and no formal agricultural training, she faced numerous challenges including poor soil quality, unpredictable weather, and lack of market access. Determined to succeed, Maya researched organic farming techniques online and attended local workshops. She implemented sustainable practices like crop rotation, composting, and rainwater harvesting, which gradually improved her yields. To overcome financial hurdles, she secured a small loan and invested in a drip irrigation system, significantly reducing water costs. Maya then leveraged social media to market her organic vegetables directly to consumers, building a loyal customer base. Within three years, her business expanded to supply organic produce to supermarkets in three nearby cities, employing 15 local workers and inspiring other farmers in her community to adopt organic methods.",
+  // Fetch backend stories
+  useEffect(() => {
+    setLoading(true);
+    fetch(API_URL)
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setStories(data);
+        } else {
+          setStories([]);
+        }
+      })
+      .catch(() => {
+        setStories([]);
+        setError("Failed to load stories from backend.");
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Update author and authorId if user changes (e.g. after login)
+  useEffect(() => {
+    setNewStory((prev) => ({
+      ...prev,
+      author: currentUserName,
+      authorId: currentUserId,
+    }));
+  }, [currentUserName, currentUserId]);
+
+  // Handle form input
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewStory((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Handle file upload (for thumbnail)
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewStory((prev) => ({ ...prev, thumbnail: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Add new story (POST to backend)
+  const handleAddStory = async (e) => {
+    e.preventDefault();
+    setFormLoading(true);
+    setError(null);
+
+    if (!newStory.thumbnail) {
+      setError("Please upload a photo for your story.");
+      setFormLoading(false);
+      return;
+    }
+
+    try {
+      const storyToSend = {
+        ...newStory,
+        authorId: currentUserId,
+        keyLessons: newStory.keyLessons
+          ? newStory.keyLessons.split(",").map((k) => k.trim())
+          : [],
+        thumbnail: newStory.thumbnail,
+        likes: 0,
+        views: 0,
+        date: new Date().toLocaleDateString(),
+        hasVideo: false,
+      };
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(storyToSend),
+      });
+      if (!res.ok) throw new Error("Failed to save story");
+      const saved = await res.json();
+      setStories((prev) => [saved, ...prev]);
+      setShowModal(false);
+      setNewStory({
+        title: "",
+        author: currentUserName,
+        authorId: currentUserId,
+        region: "",
+        sector: "",
+        challenge: "",
+        summary: "",
+        fullStory: "",
+        keyLessons: "",
+        thumbnail: "",
+      });
+      toast.success("Story submitted successfully!");
+    } catch (err) {
+      setError("Could not save story. Try again.");
+      toast.error("Could not save story. Try again.");
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  // Delete story (only if owner, and only for backend stories)
+  const handleDeleteStory = async (storyId) => {
+    if (!window.confirm("Are you sure you want to delete this story?")) return;
+    try {
+      const res = await fetch(`${API_URL}/${storyId}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete story");
+      setStories((prev) => prev.filter((s) => (s._id || s.id) !== storyId));
+      toast.success("Story deleted!");
+    } catch (err) {
+      toast.error("Could not delete story.");
+    }
   };
 
   const toggleLike = (id) => {
-    setLikedStories((prev) => {
-      const isLiked = prev[id] !== undefined;
-      const story = stories.find((s) => s.id === id);
-      const newLikes = isLiked ? story.likes - 1 : story.likes + 1;
-
-      return {
-        ...prev,
-        [id]: !isLiked,
-      };
-    });
+    setLikedStories((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+    toast("Thanks for your feedback!", { icon: "👍", duration: 1200 });
   };
 
-  const toggleFullStory = (id) => {
-    setShowFullStory((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
-
-  const toggleFeaturedStory = () => {
-    setShowFeaturedFullStory((prev) => !prev);
-  };
+  // Always show default stories + backend stories
+  const allStories = [...defaultStories, ...stories];
 
   // Filter stories based on selected criteria
-  const filteredStories = stories.filter((story) => {
+  const filteredStories = allStories.filter((story) => {
     if (filterCriteria === "all") return true;
     if (filterCriteria.startsWith("sector-")) {
       return story.sector === filterCriteria.split("sector-")[1];
@@ -309,268 +210,475 @@ const SuccessStories = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-white">
-      <div className="max-w-6xl mx-auto p-6">
-        <h1 className="text-4xl font-bold text-green-800 text-center mb-8">
-          Success Stories & Case Studies
-        </h1>
+    <div className="min-h-screen bg-gradient-to-br from-green-100 via-white to-blue-100 relative overflow-x-hidden">
+      <Toaster position="top-right" />
+      {/* Floating SVG background for extra visual effect */}
+      <svg
+        className="fixed left-0 top-0 z-0 opacity-20 pointer-events-none"
+        width="100vw"
+        height="100vh"
+        style={{ minWidth: "100vw", minHeight: "100vh" }}
+      >
+        <defs>
+          <radialGradient id="bg-grad" cx="50%" cy="50%" r="80%">
+            <stop offset="0%" stopColor="#bbf7d0" />
+            <stop offset="100%" stopColor="#38bdf8" />
+          </radialGradient>
+        </defs>
+        <ellipse
+          cx="60%"
+          cy="10%"
+          rx="400"
+          ry="180"
+          fill="url(#bg-grad)"
+          filter="blur(80px)"
+        />
+      </svg>
 
-        {/* Featured Story */}
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-12">
-          <div className="md:flex">
-            <div className="md:w-1/2">
-              <img
-                src={women1}
-                alt="Featured success story"
-                className="w-full h-64 md:h-full object-cover"
+      {/* Subtle background pattern */}
+      <div className="pointer-events-none fixed inset-0 z-0 opacity-10" style={{background: "url('https://www.toptal.com/designers/subtlepatterns/patterns/symphony.png') repeat"}}></div>
+
+      {/* Responsive Floating Add Story Button (FAB) */}
+      <button
+        className={`
+          fixed z-50 flex items-center justify-center
+          bg-gradient-to-r from-green-500 to-blue-500 text-white shadow-2xl
+          rounded-full border-4 border-white
+          transition-all duration-200
+          hover:scale-110 active:scale-95
+          overflow-hidden ripple
+          add-story-fab
+        `}
+        onClick={(e) => {
+          setShowModal(true);
+          // Ripple effect
+          const btn = e.currentTarget;
+          const circle = document.createElement("span");
+          circle.className = "ripple-effect";
+          circle.style.left = `${e.nativeEvent.offsetX}px`;
+          circle.style.top = `${e.nativeEvent.offsetY}px`;
+          btn.appendChild(circle);
+          setTimeout(() => circle.remove(), 600);
+        }}
+        title="Add Story"
+        aria-label="Add Story"
+      >
+        <span className="text-3xl md:text-2xl">+</span>
+        <span className="hidden md:inline ml-2 font-bold text-lg pr-2">Add Story</span>
+      </button>
+      {/* Responsive FAB styles */}
+      <style>{`
+        .add-story-fab {
+          width: 56px;
+          height: 56px;
+          bottom: 24px;
+          right: 24px;
+          font-size: 2rem;
+        }
+        @media (min-width: 768px) {
+          .add-story-fab {
+            width: auto;
+            height: auto;
+            padding: 0.5rem 1.5rem;
+            top: 1.5rem;
+            bottom: auto;
+            right: 2rem;
+            font-size: 1.25rem;
+          }
+        }
+      `}</style>
+
+{showModal && (
+  <div className="fixed inset-0 flex items-center justify-center z-50 animate-fade-in" style={{background: "rgba(255,255,255,0.7)", backdropFilter: "blur(2px)"}}>
+    <form
+      className="w-full max-w-3xl bg-white rounded-2xl shadow-xl border border-gray-200 p-0 flex flex-col md:flex-row"
+      onSubmit={handleAddStory}
+    >
+      {/* Left Side: Inputs */}
+      <div className="flex-1 p-8 flex flex-col justify-center">
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-green-700 flex items-center gap-2">
+            <span role="img" aria-label="star">🌱</span> Share Your Success Story
+          </h2>
+          <button
+            type="button"
+            className="text-gray-400 hover:text-red-500 text-2xl"
+            onClick={() => setShowModal(false)}
+            aria-label="Close"
+          >
+            &times;
+          </button>
+        </div>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-green-800 mb-1">Title</label>
+            <input
+              name="title"
+              placeholder="Story Title"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400 outline-none"
+              value={newStory.title}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-green-800 mb-1">Your Name</label>
+            <input
+              name="author"
+              placeholder="Your Name"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400 outline-none"
+              value={newStory.author}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+          <div className="flex gap-3">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-green-800 mb-1">Region</label>
+              <input
+                name="region"
+                placeholder="Region (e.g. Gujarat)"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400 outline-none"
+                value={newStory.region}
+                onChange={handleInputChange}
+                required
               />
             </div>
-            <div className="md:w-1/2 p-8">
-              <div className="flex items-center mb-4">
-                <span className="bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">
-                  Featured Story
-                </span>
-              </div>
-              <h2 className="text-2xl font-bold text-green-800 mb-4">
-                {featuredStory.title}
-              </h2>
-              <p className="text-gray-600 mb-6">{featuredStory.summary}</p>
-              {showFeaturedFullStory && (
-                <p className="text-gray-700 mb-6">{featuredStory.fullStory}</p>
-              )}
-              <button
-                className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors duration-300"
-                onClick={toggleFeaturedStory}
-              >
-                {showFeaturedFullStory ? "Hide Full Story" : "Read Full Story"}
-              </button>
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-green-800 mb-1">Sector</label>
+              <input
+                name="sector"
+                placeholder="Sector (e.g. farming, dairy)"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400 outline-none"
+                value={newStory.sector}
+                onChange={handleInputChange}
+                required
+              />
             </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-green-800 mb-1">Main Challenge</label>
+            <input
+              name="challenge"
+              placeholder="Main Challenge (e.g. savings)"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400 outline-none"
+              value={newStory.challenge}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-green-800 mb-1">Short Summary</label>
+            <input
+              name="summary"
+              placeholder="Short Summary"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400 outline-none"
+              value={newStory.summary}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+        </div>
+      </div>
+      {/* Right Side: Textarea, Lessons, Photo, Submit */}
+      <div className="flex-1 p-8 flex flex-col justify-center border-t md:border-t-0 md:border-l border-gray-200">
+        <div className="space-y-4 flex-1 flex flex-col">
+          <div>
+            <label className="block text-sm font-medium text-green-800 mb-1">Full Story</label>
+            <textarea
+              name="fullStory"
+              placeholder="Full Story"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400 outline-none"
+              value={newStory.fullStory}
+              onChange={handleInputChange}
+              required
+              rows={5}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-green-800 mb-1">
+              Key Lessons <span className="text-xs text-gray-400">(comma separated)</span>
+            </label>
+            <input
+              name="keyLessons"
+              placeholder="Key Lessons (comma separated)"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400 outline-none"
+              value={newStory.keyLessons}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-green-800 mb-1">
+              Photo <span className="text-xs text-gray-400">(required)</span>
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              className="w-full"
+              onChange={handleFileChange}
+              required
+            />
+          </div>
+          {error && (
+            <div className="text-red-600 text-center">{error}</div>
+          )}
+        </div>
+        <div className="mt-8 flex justify-end">
+          <button
+            type="submit"
+            className="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-2 rounded-lg shadow transition text-base flex items-center gap-2"
+            disabled={formLoading}
+          >
+            <span role="img" aria-label="send">🚀</span>
+            {formLoading ? "Submitting..." : "Submit Story"}
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+)}
+
+
+      <div className="max-w-7xl mx-auto px-4 py-10 relative z-10">
+        <h1 className="text-5xl font-extrabold text-center text-green-700 mb-4 drop-shadow-lg tracking-tight animate-fade-in">
+          🌟 Success Stories
+        </h1>
+        <div className="flex justify-center mb-10">
+          <div className="w-32 border-b-4 border-green-400"></div>
+        </div>
+
+        {/* Featured Story */}
+        <div className="bg-gradient-to-r from-green-200 via-white to-blue-200 rounded-3xl shadow-2xl mb-16 flex flex-col md:flex-row overflow-hidden border-4 border-green-300 animate-fade-in">
+          <div className="md:w-1/2">
+            <img
+              src={women1}
+              alt="Featured"
+              className="w-full h-80 object-cover"
+            />
+          </div>
+          <div className="md:w-1/2 p-10 flex flex-col justify-center">
+            <span className="bg-green-600 text-white text-xs px-4 py-1 rounded-full mb-3 w-max font-bold shadow">
+              FEATURED
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold text-green-800 mb-3">
+              {featuredStory.title}
+            </h2>
+            <p className="text-gray-700 mb-4">{featuredStory.summary}</p>
+            {showFeaturedFullStory && (
+              <p className="text-gray-800 mb-4">{featuredStory.fullStory}</p>
+            )}
+            <button
+              className="bg-green-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 transition w-max shadow"
+              onClick={() => setShowFeaturedFullStory((v) => !v)}
+            >
+              {showFeaturedFullStory ? "Hide Full Story" : "Read Full Story"}
+            </button>
           </div>
         </div>
 
-        {/* Filter Section */}
-        <div className="text-center mb-8">
-          <h2 className="text-2xl font-semibold text-green-800 mb-4">
-            Filter Stories
-          </h2>
-          <div className="flex flex-wrap justify-center gap-4">
+        {/* Filters */}
+        <div className="flex flex-wrap justify-center gap-3 mb-10">
+          {[
+            { label: "All", value: "all" },
+            { label: "Farming", value: "sector-farming" },
+            { label: "Dairy", value: "sector-dairy" },
+            { label: "Small Business", value: "sector-small-business" },
+            { label: "Gujarat", value: "region-Gujarat" },
+            { label: "Punjab", value: "region-Punjab" },
+            { label: "Rajasthan", value: "region-Rajasthan" },
+            { label: "Loan Application", value: "challenge-loan-application" },
+            { label: "Savings", value: "challenge-savings" },
+            { label: "Digital Adoption", value: "challenge-digital-adoption" },
+          ].map((f) => (
             <button
-              className={`px-4 py-2 rounded-lg ${
-                filterCriteria === "all"
-                  ? "bg-green-600 text-white"
-                  : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+              key={f.value}
+              className={`px-4 py-2 rounded-full font-semibold border-2 transition-all duration-200 ${
+                filterCriteria === f.value
+                  ? "bg-gradient-to-r from-green-500 to-blue-500 text-white border-green-500 scale-105 shadow"
+                  : "bg-white text-green-700 border-green-200 hover:bg-green-100"
               }`}
-              onClick={() => setFilterCriteria("all")}
+              onClick={() => setFilterCriteria(f.value)}
             >
-              All Stories
+              {f.label}
             </button>
-            {/* Sector Filters */}
-            <button
-              className={`px-4 py-2 rounded-lg ${
-                filterCriteria === "sector-farming"
-                  ? "bg-green-600 text-white"
-                  : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-              }`}
-              onClick={() => setFilterCriteria("sector-farming")}
-            >
-              Farming
-            </button>
-            <button
-              className={`px-4 py-2 rounded-lg ${
-                filterCriteria === "sector-dairy"
-                  ? "bg-green-600 text-white"
-                  : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-              }`}
-              onClick={() => setFilterCriteria("sector-dairy")}
-            >
-              Dairy
-            </button>
-            <button
-              className={`px-4 py-2 rounded-lg ${
-                filterCriteria === "sector-small-business"
-                  ? "bg-green-600 text-white"
-                  : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-              }`}
-              onClick={() => setFilterCriteria("sector-small-business")}
-            >
-              Small Business
-            </button>
-            {/* Region Filters */}
-            <button
-              className={`px-4 py-2 rounded-lg ${
-                filterCriteria === "region-Gujarat"
-                  ? "bg-green-600 text-white"
-                  : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-              }`}
-              onClick={() => setFilterCriteria("region-Gujarat")}
-            >
-              Gujarat
-            </button>
-            <button
-              className={`px-4 py-2 rounded-lg ${
-                filterCriteria === "region-Punjab"
-                  ? "bg-green-600 text-white"
-                  : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-              }`}
-              onClick={() => setFilterCriteria("region-Punjab")}
-            >
-              Punjab
-            </button>
-            <button
-              className={`px-4 py-2 rounded-lg ${
-                filterCriteria === "region-Rajasthan"
-                  ? "bg-green-600 text-white"
-                  : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-              }`}
-              onClick={() => setFilterCriteria("region-Rajasthan")}
-            >
-              Rajasthan
-            </button>
-            {/* Challenge Filters */}
-            <button
-              className={`px-4 py-2 rounded-lg ${
-                filterCriteria === "challenge-loan-application"
-                  ? "bg-green-600 text-white"
-                  : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-              }`}
-              onClick={() => setFilterCriteria("challenge-loan-application")}
-            >
-              Loan Application
-            </button>
-            <button
-              className={`px-4 py-2 rounded-lg ${
-                filterCriteria === "challenge-savings"
-                  ? "bg-green-600 text-white"
-                  : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-              }`}
-              onClick={() => setFilterCriteria("challenge-savings")}
-            >
-              Savings
-            </button>
-            <button
-              className={`px-4 py-2 rounded-lg ${
-                filterCriteria === "challenge-digital-adoption"
-                  ? "bg-green-600 text-white"
-                  : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-              }`}
-              onClick={() => setFilterCriteria("challenge-digital-adoption")}
-            >
-              Digital Adoption
-            </button>
-          </div>
+          ))}
         </div>
 
         {/* Stories Grid */}
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {filteredStories.length > 0 ? (
-            filteredStories.map((story) => (
-              <div
-                key={story.id}
-                className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition-shadow duration-300"
-              >
-                <div
-                  className="relative cursor-pointer"
-                  onClick={() => {
-                    if (story.hasVideo) {
-                      setVideoUrl(story.videoUrl);
-                    }
-                  }}
-                >
-                  <img
-                    src={story.thumbnail}
-                    alt={story.title}
-                    className="w-full h-48 object-cover"
-                  />
-                  {story.hasVideo && (
-                    <div className="absolute top-4 right-4 bg-black bg-opacity-50 rounded-lg px-3 py-1 text-white text-sm">
-                      ▶ Video
+        {loading ? (
+          <div className="text-center text-green-700 text-xl py-12 animate-pulse">Loading stories...</div>
+        ) : error ? (
+          <div className="text-center text-red-600 py-12">{error}</div>
+        ) : (
+          <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
+            {filteredStories.length > 0 ? (
+              filteredStories.map((story, idx) => {
+                const storyId = story._id || story.id;
+                const isOwner =
+                  !!user &&
+                  !!story.authorId &&
+                  !!user.id &&
+                  story.authorId === user.id;
+                const isBackendStory = !!story._id;
+                return (
+                  <div
+                    key={storyId}
+                    className="bg-white rounded-2xl shadow-xl border-2 border-green-100 hover:shadow-green-400/60 hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col transform hover:scale-105 animate-fade-in"
+                    style={{ animationDelay: `${idx * 60}ms` }}
+                  >
+                    <div className="relative">
+                      <img
+                        src={story.thumbnail}
+                        alt={story.title}
+                        className="w-full h-48 object-cover"
+                      />
+                      <div className="absolute bottom-3 left-3 flex gap-2">
+                        <span className="bg-green-200 text-green-800 text-xs px-2 py-1 rounded-full">
+                          {story.sector}
+                        </span>
+                        <span className="bg-blue-200 text-blue-800 text-xs px-2 py-1 rounded-full">
+                          {story.region}
+                        </span>
+                      </div>
+                      {isOwner && isBackendStory && (
+                        <button
+                          className="absolute top-3 right-3 bg-red-500 text-white rounded-full px-3 py-1 text-xs font-bold shadow hover:bg-red-700 transition"
+                          onClick={() => handleDeleteStory(storyId)}
+                          title="Delete Story"
+                        >
+                          Delete
+                        </button>
+                      )}
                     </div>
-                  )}
-                </div>
-
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-green-800 mb-2">
-                    {story.title}
-                  </h3>
-                  <p className="text-gray-600 mb-4">{story.summary}</p>
-
-                  <h4 className="font-semibold text-green-800 mb-2">
-                    Key Lessons:
-                  </h4>
-                  <ul className="space-y-1">
-                    {story.keyLessons.map((lesson, index) => (
-                      <li
-                        key={index}
-                        className="text-gray-600 text-sm flex items-center"
-                      >
-                        ✅ {lesson}
-                      </li>
-                    ))}
-                  </ul>
-
-                  <div className="flex items-center justify-between text-sm text-gray-500 mt-4">
-                    <span>👀 {story.views} Views</span>
-                    {/* Heart Symbol with Count */}
-                    <div className="flex items-center">
-                      <button
-                        className={`text-lg transition-colors duration-300 ${
-                          likedStories[story.id] ? "text-red-600" : "text-gray-400"
-                        }`}
-                        onClick={(e) => {
-                          e.stopPropagation(); // Prevent triggering video play
-                          toggleLike(story.id);
-                        }}
-                      >
-                        {likedStories[story.id] ? "❤️" : "🩶"}
-                      </button>
-                      <span className="ml-2">
-                        {story.likes + (likedStories[story.id] ? 1 : 0)} Likes
-                      </span>
+                    <div className="p-6 flex-1 flex flex-col">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div
+                          className={`w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold text-white ${getAvatarColor(
+                            story.author
+                          )} shadow`}
+                        >
+                          {(story.author || "U")[0]}
+                        </div>
+                        <div>
+                          <div className="font-semibold text-green-800">
+                            {story.author}
+                          </div>
+                          <div className="text-xs text-gray-400">{story.date}</div>
+                        </div>
+                      </div>
+                      <h3 className="text-lg font-bold text-green-700 mb-1">
+                        {story.title}
+                      </h3>
+                      <p className="text-gray-600 mb-2">{story.summary}</p>
+                      <div className="mb-2">
+                        <span className="font-semibold text-green-700">
+                          Key Lessons:
+                        </span>
+                        <ul className="list-disc list-inside text-gray-600 text-sm mt-1">
+                          {(story.keyLessons || []).map((lesson, idx) => (
+                            <li key={idx}>{lesson}</li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div className="flex items-center justify-between mt-auto pt-2">
+                        <span className="text-gray-500 text-xs flex items-center gap-1">
+                          👀 {story.views || 0} views
+                        </span>
+                        <button
+                          className={`text-xl transition-colors duration-300 ${
+                            likedStories[storyId]
+                              ? "text-red-500"
+                              : "text-gray-400"
+                          }`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleLike(storyId);
+                          }}
+                          title="Like"
+                        >
+                          {likedStories[storyId] ? "❤️" : "🤍"}
+                        </button>
+                        <span className="text-gray-500 text-xs">
+                          {(story.likes || 0) + (likedStories[storyId] ? 1 : 0)} likes
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            ))
-          ) : (
-            <p className="text-center text-gray-500">No stories found.</p>
-          )}
-        </div>
+                );
+              })
+            ) : (
+              <p className="text-center text-gray-500 col-span-full">
+                No stories found.
+              </p>
+            )}
+          </div>
+        )}
       </div>
-
 
       {/* Video Modal */}
       {videoUrl && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center"
-          onClick={() => setVideoUrl(null)}
-        >
-          <div className="bg-white p-4 rounded-lg shadow-lg relative w-11/12 md:w-3/4 lg:w-1/2">
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50 animate-fade-in">
+          <div className="bg-white p-4 rounded-2xl shadow-2xl relative w-11/12 md:w-3/4 lg:w-1/2 border-4 border-green-300">
             <button
-              className="absolute top-2 right-2 bg-red-500 text-white rounded-full px-3 py-1"
+              className="absolute top-2 right-2 bg-red-500 text-white rounded-full px-3 py-1 text-xl hover:scale-125 transition"
               onClick={() => setVideoUrl(null)}
             >
               ✖
             </button>
             <iframe
               width="100%"
-              height="315"
+              height="350"
               src={videoUrl}
               title="Success Story Video"
               frameBorder="0"
               allowFullScreen
+              className="rounded-lg"
             ></iframe>
           </div>
         </div>
       )}
+
+      {/* Animations and Effects */}
+      <style>{`
+        .animate-fade-in {
+          animation: fadeInUp 0.7s both;
+        }
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(40px);
+          }
+          to {
+            opacity: 1;
+            transform: none;
+          }
+        }
+        .glass {
+          background: rgba(255,255,255,0.85);
+          box-shadow: 0 8px 32px 0 rgba(31,38,135,0.15);
+          backdrop-filter: blur(8px);
+        }
+        .ripple-effect {
+          position: absolute;
+          border-radius: 50%;
+          transform: scale(0);
+          animation: ripple 0.6s linear;
+          background-color: rgba(255,255,255,0.7);
+          pointer-events: none;
+          width: 120px;
+          height: 120px;
+          z-index: 10;
+        }
+        @keyframes ripple {
+          to {
+            transform: scale(2.5);
+            opacity: 0;
+          }
+        }
+      `}</style>
     </div>
   );
 };
 
 export default SuccessStories;
-
-
-
-
-
-
-

@@ -9,6 +9,7 @@ const financialAdviceRoutes = require("./routes/financialAdvice");
 const businessTypesRoutes = require("./routes/businessTypes");
 const addRoutes = require("./routes/add");
 const communityRoutes = require('./routes/community');
+const successStoriesRoutes = require("./routes/successStories")
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -44,6 +45,7 @@ app.use("/api/financial-advice", financialAdviceRoutes);
 app.use("/api/business-types", businessTypesRoutes);
 app.use("/api/add", addRoutes);
 app.use('/api/communities', communityRoutes);
+app.use("/api/success-stories",successStoriesRoutes );
 
 app.get("/ping", (req, res) => {
   res.send("Hello Server");
