@@ -12,6 +12,8 @@ const communityRoutes = require('./routes/community');
 const successStoriesRoutes = require("./routes/successStories")
 
 const app = express();
+const http = require('http').createServer(app);
+const { Server } = require('socket.io');
 const PORT = process.env.PORT || 8080;
 
 // Allow both local and production frontend URLs
@@ -51,6 +53,26 @@ app.get("/ping", (req, res) => {
   res.send("Hello Server");
 });
 
+// --- SOCKET.IO SETUP ---
+const io = new Server(http, {
+  cors: {
+    origin: allowedOrigins,
+    methods: ["GET", "POST"]
+  }
+});
+
+io.on('connection', (socket) => {
+  socket.on('joinCommunity', (communityId) => {
+    socket.join(communityId);
+  });
+
+  socket.on('sendMessage', (data) => {
+    socket.to(data.communityId).emit('newMessage', data.message);
+  });
+});
+
+app.set('io', io);
+
 // Serve React frontend in production
 // if (process.env.NODE_ENV === "production") {
 //   app.use(express.static(path.join(__dirname, "../client/build")));
@@ -59,6 +81,6 @@ app.get("/ping", (req, res) => {
 //   });
 // }
 
-app.listen(PORT, () => {
+http.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

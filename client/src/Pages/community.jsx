@@ -1,10 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { useUser } from '@clerk/clerk-react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { io } from 'socket.io-client';
 
 const API = process.env.REACT_APP_BACKEND_URL;
+
+// --- SOCKET.IO CLIENT SINGLETON ---
+let socket;
+function getSocket() {
+  if (!socket) {
+    socket = io(API, { transports: ['websocket'] });
+  }
+  return socket;
+}
 
 const getInitials = (name = "") =>
   name
@@ -17,16 +27,37 @@ const getInitials = (name = "") =>
 const CommunityChat = ({ communityId, userId, userName }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
+    // Join the community room
+    const s = getSocket();
+    s.emit('joinCommunity', communityId);
+
+    // Fetch initial messages
     axios.get(`${API}/api/communities/${communityId}/messages`)
       .then(res => setMessages(res.data));
+
+    // Listen for new messages
+    const handleNewMessage = (msg) => {
+      setMessages((prev) => [...prev, msg]);
+    };
+    s.on('newMessage', handleNewMessage);
+
+    return () => {
+      s.off('newMessage', handleNewMessage);
+    };
   }, [communityId]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
     const res = await axios.post(`${API}/api/communities/${communityId}/messages`, { userId, userName, text: input });
     setMessages([...messages, res.data]);
+    getSocket().emit('sendMessage', { communityId, message: res.data });
     setInput('');
   };
 
@@ -45,6 +76,7 @@ const CommunityChat = ({ communityId, userId, userName }) => {
             </span>
           </div>
         ))}
+        <div ref={messagesEndRef} />
       </div>
       <div className="flex gap-2 sticky bottom-0 bg-white py-2">
         <input
