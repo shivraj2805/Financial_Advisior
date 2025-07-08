@@ -1,40 +1,65 @@
-const axios = require("axios");
-const cheerio = require("cheerio");
-const fs = require("fs");
+const puppeteer = require('puppeteer');
 
-// URL of the government website
-const URL = "https://www.india.gov.in/people-groups/community/women";
+async function scrapeSchemes() {
+  try {
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
 
-// Function to scrape data
-async function scrapeData() {
-    try {
-        // Fetch webpage content
-        const { data } = await axios.get(URL, {
-            headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" }
-        });
+    const page = await browser.newPage();
+    console.log("🌐 Opening schemes page...");
 
-        // Load HTML into cheerio
-        const $ = cheerio.load(data);
+    await page.goto('https://www.india.gov.in/my-government/schemes-0', {
+      waitUntil: 'networkidle2',
+      timeout: 60000
+    });
 
-        // Find and extract scheme names (modify selector as per site structure)
-        let schemes = [];
-        $("h3").each((index, element) => {
-            schemes.push($(element).text().trim());
-        });
+    // ✅ Wait for correct selector
+    await page.waitForSelector('.views-infinite-scroll-content-wrapper', { timeout: 15000 });
 
-        // Print the extracted schemes
-        console.log("List of Women's Empowerment Schemes:");
-        console.log(schemes);
+    // Optional: scroll to bottom to trigger lazy loading
+    await autoScroll(page);
 
-        // Save data to a file
-        fs.writeFileSync("women_schemes.json", JSON.stringify(schemes, null, 2));
+    // Screenshot for debugging
+    await page.screenshot({ path: 'schemes.png', fullPage: true });
 
-        console.log("Scraped data saved to women_schemes.json");
+    const data = await page.evaluate(() => {
+      const rows = document.querySelectorAll('.views-row');
+      return Array.from(rows).map(row => {
+        const title = row.querySelector('.field-content a')?.innerText.trim() || '';
+        const desc = row.querySelector('.field-content .description')?.innerText.trim() || '';
+        return { title, desc };
+      });
+    });
 
-    } catch (error) {
-        console.error("Error scraping data:", error.message);
-    }
+    console.log(`✅ Scraped ${data.length} schemes`);
+    await browser.close();
+    return data;
+
+  } catch (error) {
+    console.error("❌ Scraping error:", error);
+    return [];
+  }
 }
 
-// Run the scraper
-scrapeData();
+// Helper to scroll to bottom to trigger lazy loading
+async function autoScroll(page) {
+  await page.evaluate(async () => {
+    await new Promise((resolve) => {
+      let totalHeight = 0;
+      const distance = 100;
+      const timer = setInterval(() => {
+        const scrollHeight = document.body.scrollHeight;
+        window.scrollBy(0, distance);
+        totalHeight += distance;
+        if (totalHeight >= scrollHeight - window.innerHeight) {
+          clearInterval(timer);
+          resolve();
+        }
+      }, 200);
+    });
+  });
+}
+
+module.exports = scrapeSchemes;

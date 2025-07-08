@@ -10,6 +10,7 @@ import Testimonials from './Testimonials/Testimonials';
 import Contact from './Contact/Contact';
 import Footer from './Footer/Footer';
 import  { useState, useRef, useEffect } from "react";
+
 import {
   Menu,
   X,

@@ -20,17 +20,19 @@ const PORT = process.env.PORT || 8080;
 const allowedOrigins = [
   "http://localhost:3000",
   "https://finadvisior.vercel.app",
-  "https://www.finadvisior.vercel.app"
+  "https://finadvisorapp.vercel.app"
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
-    console.log("Request Origin:", origin); // For debugging
-    if (!origin) return callback(null, true); // Allow non-browser requests
+    console.log("Request Origin:", origin);
+
+    if (!origin) return callback(null, true);
+
     if (
       allowedOrigins.includes(origin) ||
-      origin?.startsWith("http://localhost") ||
-      /^https:\/\/.*\.finadvisior\.vercel\.app$/.test(origin)
+      /^https:\/\/.*\.finadvisior\.vercel\.app$/.test(origin) ||
+      /^https:\/\/.*\.finadvisorapp\.vercel\.app$/.test(origin)
     ) {
       return callback(null, true);
     } else {
@@ -39,6 +41,7 @@ app.use(cors({
   },
   credentials: true
 }));
+
 
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

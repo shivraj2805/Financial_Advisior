@@ -83,7 +83,7 @@ const NavBar = ({ language, toggleLanguage }) => {
               className="flex items-center text-green-800  hover:text-blue-900 transition-colors"
             >
               <Globe className="h-4 w-4 mr-1" />
-              {language.toUpperCase()}
+              {/* {language.toUpperCase()} */}
             </button>
 
             {/* Show User Profile Button if signed in */}
