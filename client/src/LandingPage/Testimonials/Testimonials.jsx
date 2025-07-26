@@ -10,12 +10,12 @@ const testimonials = [
         role: "Software Developer",
         text: "Working on this Financial Advisor platform has been an incredible experience. Crafting secure, scalable software to help users manage their finances smarter is deeply rewarding."
     },
-    {
-        img: user_2,
-        name: "Aditya Deshmukh",
-        role: "ML Engineer",
-        text: "We’re using machine learning to offer personalized financial insights. It's amazing to see data-driven strategies genuinely help users plan their futures."
-    }
+    // {
+    //     img: user_2,
+    //     name: "Aditya Deshmukh",
+    //     role: "ML Engineer",
+    //     text: "We’re using machine learning to offer personalized financial insights. It's amazing to see data-driven strategies genuinely help users plan their futures."
+    // }
 ];
 
 const Testimonials = () => {
