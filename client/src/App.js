@@ -29,8 +29,10 @@ import RegistrationPage from "./Pages/Signup";
 import ProtectedRoute from "./components/protected-route"; 
 
 import FinancialAdvisorChatbotUi from "./Pages/financialAdvisiorChatBotUi";
-import LandingPage from "./LandingPage/Landingpage";  
+import LandingPage from "./LandingPage/Landingpage";
 
+// Import your ExpenseTracker component
+import ExpenseTracker from "./Pages/ExpenseTracker"; // Adjust the path based on your file structure
 
 function App() {
   return (
@@ -69,6 +71,8 @@ function App() {
 
         <Route path="/advisor" element={<ProtectedRoute><FinancialAdvisorChatbotUi /></ProtectedRoute>} />
 
+        {/* Add the Expense Tracker route */}
+        <Route path="/expenses" element={<ProtectedRoute><ExpenseTracker /></ProtectedRoute>} />
 
         <Route path="*" element={<ErrorPage />} />
       </Routes>

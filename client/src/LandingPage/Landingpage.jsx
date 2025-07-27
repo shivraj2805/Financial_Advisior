@@ -34,7 +34,10 @@ import {
   Compass,
   Newspaper as News,
   Calculator as Calc,
-  BadgeSwissFranc, FileText, Bot
+  BadgeSwissFranc, 
+  FileText, 
+  Bot,
+  Receipt // Added Receipt icon for expense tracker
 } from "lucide-react";
 
 import Features from "../components/Features";
@@ -58,86 +61,6 @@ const translations = {
       title: "Why Choose Us",
       description:
         "Discover the tools and resources that make us your ideal partner in your journey to success.",
-      // items: [
-      //   {
-      //     title: "User Profiles",
-      //     description: "View and manage detailed user profiles",
-      //     link: "/profiles",
-      //     icon: User,
-      //   },
-      //   {
-      //     title: "Schemes & Benefits",
-      //     description: "View and manage detailed user profiles",
-      //     link: "/scheme",
-      //     icon: Shield,
-      //   },
-      //   {
-      //     title: "Learning Center",
-      //     description: "Access courses and educational content",
-      //     link: "/learn",
-      //     icon: BookOpen,
-      //   },
-      //   {
-      //     title: "Roadmap",
-      //     description: "Access courses and educational content",
-      //     link: "/road",
-      //     icon: Map,
-      //   },
-      //   {
-      //     title: "Daily Tech News",
-      //     description: "Stay updated with the latest tech news",
-      //     link: "/news",
-      //     icon: Newspaper,
-      //   },
-      //   {
-      //     title: "PPF Calculator",
-      //     description: "Calculate your PPF investments and returns",
-      //     link: "/ppf",
-      //     icon: Calculator,
-      //   },
-      //   {
-      //     title: "Women's Portal",
-      //     description:
-      //       "Empowering women through financial independence and support",
-      //     link: "/womens",
-      //     icon: Users,
-      //   },
-      //   {
-      //     title: "Microinvestment Opportunities",
-      //     description:
-      //       "Explore the latest investment opportunities for small investors",
-      //     link: "/mip",
-      //     icon: BadgeDollarSign,
-      //   },
-      //   {
-      //     title: "Rural Business Opportunities",
-      //     description:
-      //       "Explore the latest investment opportunities for small investors",
-      //     link: "/rural",
-      //     icon: Briefcase,
-      //   },
-      //   {
-      //     title: "Community ",
-      //     description:
-      //       "Join the community to discuss and share ideas with other users",
-      //     link: "/community",
-      //     icon: Users,
-      //   },
-      //   {
-      //     title: "Success Stories",
-      //     description:
-      //       "Read inspiring stories of individuals who have overcome adversity",
-      //     link: "/stories",
-      //     icon: Award,
-      //   },
-      //   {
-      //     title: "QnA Sessions",
-      //     description:
-      //       "Participate in live QnA sessions with financial experts",
-      //     link: "/qna",
-      //     icon: GraduationCap,
-      //   },
-      // ],
       items: [
         {
           title: "Financial Advisor - Chatbot",
@@ -156,6 +79,12 @@ const translations = {
           description: "Explore a tailored roadmap to financial success",
           link: "/road",
           icon: Map,
+        },
+        {
+          title: "Expense Tracker", // Added expense tracker
+          description: "Track and manage your daily expenses with smart categorization",
+          link: "/expenses",
+          icon: Receipt,
         },
         {
           title: "Microinvestment Opportunities",
@@ -206,7 +135,6 @@ const translations = {
           icon: FileText,
         },
       ]
-      
     },
     successStories: {
       title: "Success Stories of the Underprivileged",
@@ -252,39 +180,36 @@ const translations = {
       title: "Trending Business Ideas",
       subtitle: "Scroll to explore opportunities",
       ideas: [
-        
-          {
-            title: "Poultry Farming",
-            description: "Start your own chicken and egg production farm",
-            icon: "🐔",
-          },
-          {
-            title: "Local Grocery Store",
-            description: "Set up a store for essential food and household items",
-            icon: "🛒",
-          },
-          {
-            title: "Fishery Business",
-            description: "Raise and sell fish for local and regional markets",
-            icon: "🐟",
-          },
-          {
-            title: "Organic Farming",
-            description: "Cultivate and sell organic fruits and vegetables",
-            icon: "🥦",
-          },
-          {
-            title: "Dairy Farming",
-            description: "Produce milk and other dairy products",
-            icon: "🐄",
-          },
-          {
-            title: "Handicrafts",
-            description: "Make and sell handmade goods like baskets and pottery",
-            icon: "🎨",
-          },
-        
-        
+        {
+          title: "Poultry Farming",
+          description: "Start your own chicken and egg production farm",
+          icon: "🐔",
+        },
+        {
+          title: "Local Grocery Store",
+          description: "Set up a store for essential food and household items",
+          icon: "🛒",
+        },
+        {
+          title: "Fishery Business",
+          description: "Raise and sell fish for local and regional markets",
+          icon: "🐟",
+        },
+        {
+          title: "Organic Farming",
+          description: "Cultivate and sell organic fruits and vegetables",
+          icon: "🥦",
+        },
+        {
+          title: "Dairy Farming",
+          description: "Produce milk and other dairy products",
+          icon: "🐄",
+        },
+        {
+          title: "Handicrafts",
+          description: "Make and sell handmade goods like baskets and pottery",
+          icon: "🎨",
+        },
       ],
     },
   },
@@ -308,47 +233,76 @@ const translations = {
         "सफलता की यात्रा में आपका आदर्श साथी बनने के लिए हमारे उपकरण और संसाधनों की खोज करें।",
       items: [
         {
-          title: "उपयोगकर्ता प्रोफाइल",
-          description: "विस्तृत उपयोगकर्ता प्रोफाइल देखें और प्रबंधित करें",
-          link: "/profiles",
-          icon: <UserCheck />,
-        },
-        {
-          title: "योजना आणि लाभ",
-          description: "विस्तृत वापरकर्ता प्रोफाइल पहा आणि व्यवस्थापित करा",
-          link: "/scheme",
-          icon: <Award />,
+          title: "वित्तीय सलाहकार - चैटबॉट",
+          description: "हमारे AI-संचालित चैटबॉट से व्यक्तिगत वित्तीय सलाह प्राप्त करें",
+          link: "/advisor",
+          icon: Bot,
         },
         {
           title: "लर्निंग सेंटर",
           description: "पाठ्यक्रमों और शैक्षिक सामग्री तक पहुंचें",
           link: "/learn",
-          icon: <Book />,
+          icon: BookOpen,
         },
         {
           title: "रोडमैप",
-          description: "पाठ्यक्रमों और शैक्षिक सामग्री तक पहुंचें",
+          description: "वित्तीय सफलता के लिए एक अनुकूलित रोडमैप का अन्वेषण करें",
           link: "/road",
-          icon: <Compass />,
+          icon: Map,
         },
         {
-          title: "दैनिक टेक समाचार",
-          description: "नवीनतम तकनीकी समाचारों से अपडेट रहें",
-          link: "/news",
-          icon: <News />,
+          title: "व्यय ट्रैकर", // Added expense tracker in Hindi
+          description: "स्मार्ट वर्गीकरण के साथ अपने दैनिक खर्चों को ट्रैक और प्रबंधित करें",
+          link: "/expenses",
+          icon: Receipt,
         },
         {
-          title: "पीपीएफ कैलकुलेटर",
-          description: "अपने पीपीएफ निवेश और रिटर्न की गणना करें",
-          link: "/ppf",
-          icon: <Calc />,
+          title: "माइक्रोइन्वेस्टमेंट अवसर",
+          description: "छोटे निवेशकों के लिए नवीनतम निवेश अवसरों का अन्वेषण करें",
+          link: "/mip",
+          icon: BadgeDollarSign,
+        },
+        {
+          title: "ग्रामीण व्यापार अवसर",
+          description: "ग्रामीण भारत में व्यापारिक अवसरों का अन्वेषण करें",
+          link: "/rural",
+          icon: Briefcase,
+        },
+        {
+          title: "योजनाएं और लाभ",
+          description: "विस्तृत सरकारी योजनाओं और लाभों को देखें और प्रबंधित करें",
+          link: "/scheme",
+          icon: Shield,
+        },
+        {
+          title: "समुदाय",
+          description: "अन्य उपयोगकर्ताओं के साथ विचार चर्चा करने और साझा करने के लिए समुदाय में शामिल हों",
+          link: "/community",
+          icon: Users,
+        },
+        {
+          title: "प्रश्नोत्तर सत्र",
+          description: "वित्तीय विशेषज्ञों के साथ लाइव प्रश्नोत्तर सत्रों में भाग लें",
+          link: "/qna",
+          icon: GraduationCap,
+        },
+        {
+          title: "सफलता की कहानियां",
+          description: "उन व्यक्तियों की प्रेरणादायक कहानियां पढ़ें जिन्होंने प्रतिकूलता पर विजय पाई है",
+          link: "/stories",
+          icon: Award,
         },
         {
           title: "महिला पोर्टल",
-          description:
-            "वित्तीय स्वतंत्रता और समर्थन के माध्यम से महिलाओं को सशक्त बनाना",
-          link: "/womens-portal",
-          icon: <BadgeSwissFranc />,
+          description: "वित्तीय स्वतंत्रता और समर्थन के माध्यम से महिलाओं को सशक्त बनाना",
+          link: "/womens",
+          icon: Users,
+        },
+        {
+          title: "OCR आधारित वित्त दस्तावेज़ पठन",
+          description: "AI-संचालित OCR के साथ वित्तीय दस्तावेज़ों को स्कैन और समझें",
+          link: "/ocr",
+          icon: FileText,
         },
       ],
     },
@@ -401,8 +355,7 @@ const translations = {
           title: "ग्रीन बिजनेस",
           description: "स्थायी और पर्यावरण अनुकूल उद्यम",
           icon: "🌱",
-        },
-        {
+        },        {
           title: "हेल्थ टेक",
           description: "स्वास्थ्य तकनीक समाधान",
           icon: "⚕️",
@@ -544,7 +497,6 @@ const BusinessIdeasScroll = ({ ideas }) => {
     </div>
   );
 };
-
 
 const LandingPage = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
