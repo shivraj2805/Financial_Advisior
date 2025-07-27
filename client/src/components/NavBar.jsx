@@ -49,12 +49,12 @@ const NavBar = ({ language, toggleLanguage }) => {
             >
               CalcPro
             </a>
-            <a
+            {/* <a
               href="/scheme"
               className="text-green-800  hover:text-blue-900 transition-colors"
             >
               Scheme
-            </a>
+            </a> */}
             <a
               href="/news"
               className="text-green-800  hover:text-blue-900 transition-colors"

@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const path = require("path");
+const bodyParser = require("body-parser");
 dotenv.config();
 require('./models/db');
 
@@ -10,6 +11,7 @@ const businessTypesRoutes = require("./routes/businessTypes");
 const addRoutes = require("./routes/add");
 const communityRoutes = require('./routes/community');
 const successStoriesRoutes = require("./routes/successStories")
+const schemesRoutes = require("./routes/schemeRoutes");
 
 const app = express();
 const http = require('http').createServer(app);
@@ -42,6 +44,8 @@ app.use(cors({
   credentials: true
 }));
 
+app.use(bodyParser.json());
+
 
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -51,6 +55,7 @@ app.use("/api/business-types", businessTypesRoutes);
 app.use("/api/add", addRoutes);
 app.use('/api/communities', communityRoutes);
 app.use("/api/success-stories",successStoriesRoutes );
+app.use("/api/schemes", schemesRoutes);
 
 app.get("/ping", (req, res) => {
   res.send("Hello Server");
