@@ -1,10 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Menu, X, Globe, BadgeDollarSign } from "lucide-react";
 import { SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
 import { Navigate } from "react-router-dom";
+import "../LandingPage/Hero/Hero.css";
 
 const NavBar = ({ language, toggleLanguage }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleLoginClick = () => {
     <Navigate to="/login" />;
@@ -12,24 +22,28 @@ const NavBar = ({ language, toggleLanguage }) => {
 
 
   return (
-    <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-sm z-50">
+    <nav className={`fixed top-0 w-full z-50 transition-all duration-300 navbar-fade-in ${scrolled ? 'navbar-scrolled' : ''}`}
+      style={{
+        background: scrolled ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.08)',
+        boxShadow: scrolled ? '0 4px 24px 0 #22c55e22, 0 1.5px 4px 0 #4ade8033' : 'none',
+        borderBottom: scrolled ? '1.5px solid #bbf7d055' : 'none',
+        backdropFilter: 'blur(16px)',
+      }}
+    >
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between items-center h-16 grid grid-cols-2">
           {/* Left: Logo */}
-          <div className="flex items-center
-          ">
+          <a href="/" className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-green-50 transition duration-200">
             <BadgeDollarSign className="h-8 w-8 text-green-600" />
-            <span className="ml-2 text-xl font-bold text-green-800">
-              FinAdvise
-            </span>
-          </div>
+            <span className="ml-2 text-xl font-extrabold text-green-800 tracking-tight drop-shadow">FinAdvise</span>
+          </a>
 
           {/* Right: Navigation Links */}
           <div className="hidden md:flex items-center space-x-8 inline-block list-none mx-5 text-[rgb(6,86,6)] text-[18px] font-medium transition duration-500 cursor-pointer font-[Outfit]">
            <SignedOut>
            <a
               href="/"
-              className="text-green-800  hover:text-blue-900 transition-colors"
+              className="nav-link nav-link-animated"
             >
               Home
             </a>
@@ -38,32 +52,32 @@ const NavBar = ({ language, toggleLanguage }) => {
            <SignedIn>
            <a
               href="/financialAdvisior"
-              className="text-green-800  hover:text-blue-900 transition-colors"
+              className="nav-link nav-link-animated"
             >
               Dashboard
             </a>
            </SignedIn>
             <a
               href="/ppf"
-              className="text-green-800 hover:text-blue-900 transition-colors"
+              className="nav-link nav-link-animated"
             >
               CalcPro
             </a>
             {/* <a
               href="/scheme"
-              className="text-green-800  hover:text-blue-900 transition-colors"
+              className="nav-link"
             >
               Scheme
             </a> */}
             <a
               href="/news"
-              className="text-green-800  hover:text-blue-900 transition-colors"
+              className="nav-link nav-link-animated"
             >
               News
             </a>
             <a
               href="/road"
-              className="text-green-800  hover:text-blue-900 transition-colors"
+              className="nav-link nav-link-animated"
             >
               AdvisorMap
             </a>
@@ -72,7 +86,7 @@ const NavBar = ({ language, toggleLanguage }) => {
             <SignedOut>
               <a
                 href="/login"
-                className="text-green-800  hover:text-blue-900 transition-colors"
+                className="nav-link nav-link-animated"
               >
                 Login
               </a>
@@ -80,7 +94,7 @@ const NavBar = ({ language, toggleLanguage }) => {
 
             <button
               onClick={toggleLanguage}
-              className="flex items-center text-green-800  hover:text-blue-900 transition-colors"
+              className="flex items-center px-3 py-1 rounded-full bg-green-100 text-green-800 hover:bg-green-200 transition font-semibold shadow-sm border border-green-200"
             >
               <Globe className="h-4 w-4 mr-1" />
               {/* {language.toUpperCase()} */}
@@ -88,14 +102,16 @@ const NavBar = ({ language, toggleLanguage }) => {
 
             {/* Show User Profile Button if signed in */}
             <SignedIn>
-              <UserButton />
+              <div className="ml-2 rounded-full bg-green-50 border border-green-200 p-1 flex items-center shadow-sm">
+                <UserButton />
+              </div>
             </SignedIn>
           </div>
 
           {/* Mobile menu button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden text-green-800"
+            className="md:hidden text-green-800 p-2 rounded-lg hover:bg-green-100 transition"
           >
             {isMenuOpen ? (
               <X className="h-6 w-6" />
@@ -108,54 +124,52 @@ const NavBar = ({ language, toggleLanguage }) => {
 
       {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div className="md:hidden bg-white border-t border-green-100">
-          <div className="px-2 pt-2 pb-3 space-y-1">
+        <div className="md:hidden bg-white/95 border-t border-green-100 rounded-b-2xl shadow-lg animate-fade-in">
+          <div className="px-4 pt-4 pb-4 space-y-2">
             <a
               href="/"
-              className="block px-3 py-2 text-green-800 hover:bg-green-50 rounded-md"
+              className="block px-3 py-2 text-green-800 hover:bg-green-50 rounded-lg font-semibold transition"
             >
               Home
             </a>
             <a
               href="/ppf"
-              className="block px-3 py-2 text-green-800 hover:bg-green-50 rounded-md"
+              className="block px-3 py-2 text-green-800 hover:bg-green-50 rounded-lg font-semibold transition"
             >
               CalcPro
             </a>
             <a
               href="/scheme"
-              className="block px-3 py-2 text-green-800 hover:bg-green-50 rounded-md"
+              className="block px-3 py-2 text-green-800 hover:bg-green-50 rounded-lg font-semibold transition"
             >
               Scheme
             </a>
             <a
               href="/news"
-              className="block px-3 py-2 text-green-800 hover:bg-green-50 rounded-md"
+              className="block px-3 py-2 text-green-800 hover:bg-green-50 rounded-lg font-semibold transition"
             >
               News
             </a>
             <a
               href="/road"
-              className="block px-3 py-2 text-green-800 hover:bg-green-50 rounded-md"
+              className="block px-3 py-2 text-green-800 hover:bg-green-50 rounded-lg font-semibold transition"
             >
                   AdvisorMap
             </a>
-
 
              {/* Show Sign In Button if not signed in */}
              <SignedOut>
               <a
                 href="/login"
-                className="text-green-800  hover:text-blue-900 transition-colors"
+                className="block px-3 py-2 text-green-800 hover:bg-green-50 rounded-lg font-semibold transition"
               >
                 Login
               </a>
             </SignedOut>
 
-
             <button
               onClick={toggleLanguage}
-              className="flex items-center px-3 py-2 text-green-800 hover:bg-green-50 rounded-md w-full"
+              className="flex items-center px-3 py-2 rounded-full bg-green-100 text-green-800 hover:bg-green-200 transition font-semibold shadow-sm border border-green-200 w-full"
             >
               <Globe className="h-4 w-4 mr-1" />
               {language.toUpperCase()}
@@ -163,10 +177,11 @@ const NavBar = ({ language, toggleLanguage }) => {
 
              {/* Show User Profile Button if signed in */}
              <SignedIn>
-              <UserButton />
+              <div className="mt-2 rounded-full bg-green-50 border border-green-200 p-1 flex items-center shadow-sm">
+                <UserButton />
+              </div>
             </SignedIn>
 
-            
           </div>
         </div>
       )}

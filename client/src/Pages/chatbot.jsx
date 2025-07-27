@@ -1,247 +1,123 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Mic, User, Bot, Volume2, ChevronDown, ChevronRight } from 'lucide-react';
-
-
-
-const summaryData = 
-{
-    "Feasibility Analysis": {
-      title: "Feasibility Analysis",
-      content: {
-        type: "sections",
-        sections: [
-          {
-            title: "Current Assets",
-            items: [
-              "2 cows already owned",
-              "Daily milk production: 15 liters (7.5 liters per cow)",
-              "Available land for fodder growing",
-              "Basic shed infrastructure possible"
-            ]
-          },
-          {
-            title: "Key Challenges",
-            items: [
-              "Limited initial production scaling",
-              "Storage optimization needed",
-              "Market access management",
-              "Waste minimization requirements"
-            ]
-          }
-        ]
-      }
-    },
-    "Estimated Investment": {
-      title: "Estimated Investment Breakdown",
-      content: {
-        type: "table",
-        headers: ["Expense Category", "Cost (₹)"],
-        rows: [
-          ["Fodder and feed (3 months)", "7,500"],
-          ["Shed construction/repair", "10,000"],
-          ["Milking equipment", "5,000"],
-          ["Storage (small milk cans)", "2,500"],
-          ["Miscellaneous (transport, etc.)", "3,000"],
-          ["Total Initial Investment", "28,000"]
-        ]
-      }
-    },
-    "Profitability": {
-      title: "Profitability Analysis",
-      content: {
-        type: "multi",
-        sections: [
-          {
-            type: "metrics",
-            title: "Daily Operations",
-            metrics: [
-              { label: "Milk Production", value: "15 liters/day" },
-              { label: "Price per Liter", value: "₹40" },
-              { label: "Daily Revenue", value: "₹600" }
-            ]
-          },
-          {
-            type: "table",
-            title: "Monthly Financial Overview",
-            headers: ["Category", "Amount (₹)"],
-            rows: [
-              ["Monthly Revenue", "18,000"],
-              ["Fodder Cost", "-2,500"],
-              ["Misc. Expenses", "-1,000"],
-              ["Net Monthly Profit", "14,500"]
-            ]
-          }
-        ]
-      }
-    },
-    "Risk Management": {
-      title: "Risk Management Strategy",
-      content: {
-        type: "cards",
-        items: [
-          {
-            title: "Insurance Coverage",
-            description: "Comprehensive livestock insurance to cover illness and mortality risks",
-            action: "Get insurance quotes from local providers"
-          },
-          {
-            title: "Health Management",
-            description: "Regular veterinary checkups and preventive care schedule",
-            action: "Schedule monthly vet visits"
-          },
-          {
-            title: "Income Diversification",
-            description: "Additional revenue from by-products (manure, biogas)",
-            action: "Explore local by-product markets"
-          },
-          {
-            title: "Emergency Planning",
-            description: "Maintain ₹10,000 emergency fund for unexpected expenses",
-            action: "Set up separate emergency account"
-          }
-        ]
-      }
-    },
-    "Financing Options": {
-    title: "Financing Options",
-    content: {
-      type: "cards",
-      items: [
-        {
-          title: "NABARD Dairy Loans",
-          description: "Special loan schemes for small dairy farmers",
-          details: [
-            "Interest rate: 6-12% annually",
-            "Repayment period: 3-5 years"
-          ]
-        },
-        {
-          title: "Government Subsidies (DEDS)",
-          description: "Dairy Entrepreneurship Development Scheme",
-          details: [
-            "Up to 25-33% subsidy on investment costs"
-          ]
-        },
-        {
-          title: "Cooperative Memberships",
-          description: "Join local dairy cooperatives for support",
-          details: [
-            "Partners: Amul, Mother Dairy",
-            "Benefits: Guaranteed milk sales"
-          ]
-        },
-        {
-          title: "Microfinance Options",
-          description: "Alternative financing through MFIs",
-          details: [
-            "Small loans with flexible terms",
-            "Higher interest rates than banks"
-          ]
-        },
-        {
-          title: "Personal Savings Plan",
-          description: "Strategic use of existing savings",
-          details: [
-            "Allocate ₹20,000 from savings",
-            "Maintain ₹10,000 emergency fund"
-          ]
-        }
-      ]
-    }
-  },
-  };
-  
-
-const questions = [
-    { id: 4, text: "What is your primary source of income?", type: "options", options: ["Farming", "Shopkeeping", "Daily wage work", "Other (specify in voice)"], hasVoice: true, voicePrompt: "Say your source aloud if not listed." },
-    { id: 5, text: "How much do you earn monthly from this source?", type: "options", options: ["Less than ₹5,000", "₹5,000–₹10,000", "₹10,000–₹20,000", "Above ₹20,000"], hasVoice: true, voicePrompt: "Or say the exact amount you earn." },
-    { id: 6, text: "Do you have other sources of income, like seasonal crops or small businesses?", type: "options", options: ["Yes", "No"] },
-    { id: 7, text: "If yes, what are these sources, and how much do you earn from each?", type: "voice", voicePrompt: "Please describe your additional income sources." },
-    { id: 8, text: "How much do you spend monthly on household expenses like food, education, and electricity?", type: "options", options: ["Less than ₹5,000", "₹5,000–₹10,000", "₹10,000–₹15,000", "Above ₹15,000"], hasVoice: true, voicePrompt: "Or specify the amount aloud." },
-    { id: 9, text: "Do you have any monthly loan repayments?", type: "options", options: ["Yes", "No"] },
-    { id: 10, text: "If yes, please specify the loan type, monthly EMI, and tenure.", type: "voice", voicePrompt: "Describe the loan details aloud." },
-    { id: 11, text: "Are there any irregular expenses like festivals or family functions?", type: "options", options: ["Yes", "No"] },
-    { id: 12, text: "If yes, what is the approximate annual cost of these expenses?", type: "voice", voicePrompt: "Say the estimated cost aloud." },
-    { id: 13, text: "What assets do you own? (Choose all that apply)", type: "options", options: ["Agricultural land", "Tractor", "Livestock", "Jewelry", "Other (specify in voice)"], hasVoice: true, voicePrompt: "Say your assets aloud if not listed." },
-    { id: 14, text: "Do you have any savings?", type: "options", options: ["Savings account", "Cash at home", "Fixed deposits", "Other (specify in voice)"] },
-    { id: 15, text: "If yes, how much is the total amount of your savings?", type: "voice", voicePrompt: "Say the total amount of your savings aloud." },
-    { id: 16, text: "Do you have any outstanding loans?", type: "options", options: ["Yes", "No"] },
-    { id: 17, text: "If yes, please specify the loan type, amount, interest rate, and remaining tenure.", type: "voice", voicePrompt: "Describe your loans aloud." },
-    { id: 18, text: "Are there challenges in paying back these loans?", type: "options", options: ["Yes", "No"] },
-    { id: 19, text: "If yes, please describe the challenges.", type: "voice", voicePrompt: "Say the challenges aloud." },
-    { id: 20, text: "What are your short-term financial goals (like repairs, seeds, or equipment)?", type: "voice", voicePrompt: "Say your short-term goals aloud." },
-    { id: 21, text: "What are your long-term financial goals (like saving for education, starting a new business)?", type: "voice", voicePrompt: "Say your long-term goals aloud." },
-    { id: 22, text: "Please Ask your question. In what regards do you need our advice?", type: "options", type: "voice", voicePrompt: "In what regard do you want our advice aloud."  },
-  ];
+import { Mic, User, Bot, Volume2, Send, X, Loader2, Sparkles } from 'lucide-react';
 
 const Chatbot = () => {
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [responses, setResponses] = useState([]);
+  const [messages, setMessages] = useState([
+    {
+      id: 1,
+      role: 'bot',
+      content: "Hello! I'm Dhan Sarthi, your personal financial advisor. I can help you with personal finance, investments, government schemes, tax planning, and more. What would you like to know today?",
+      timestamp: new Date().toISOString()
+    }
+  ]);
+  const [inputMessage, setInputMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-
-  
-
-  
-  const [showSummary, setShowSummary] = useState(false);
-  const [expandedSection, setExpandedSection] = useState(null);
-
+  const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
+  const backend_url = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const stopRecording = () => {
-    const option = "Answer recorded";
-      setResponses([...responses, { question: questions[currentQuestion].text, answer: option }]);
-      setIsRecording(false);
-
-      if (currentQuestion < questions.length ) {
-        setCurrentQuestion(currentQuestion + 1);
-      }
-      if(currentQuestion === questions.length - 1) {
-        setShowSummary(true);
-      }
-    
-  };
-
   useEffect(() => {
     scrollToBottom();
-  }, [responses, currentQuestion]);
+  }, [messages]);
 
-  const handleOptionSelect = (option) => {
-    setResponses([...responses, { question: questions[currentQuestion].text, answer: option }]);
-    if (currentQuestion < questions.length ) {
-      setCurrentQuestion(currentQuestion + 1);
+  const sendMessage = async (messageText) => {
+    if (!messageText.trim()) return;
+
+    const userMessage = {
+      id: Date.now(),
+      role: 'user',
+      content: messageText,
+      timestamp: new Date().toISOString()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInputMessage('');
+    setIsLoading(true);
+    setIsTyping(true);
+
+    try {
+      // Prepare conversation history for context
+      const conversationHistory = messages.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }));
+
+      const response = await fetch(`${backend_url}/api/financial-advice/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: messageText,
+          conversationHistory: conversationHistory
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get response');
+      }
+
+      const data = await response.json();
+      
+      const botMessage = {
+        id: Date.now() + 1,
+        role: 'bot',
+        content: data.response,
+        timestamp: data.timestamp || new Date().toISOString()
+      };
+
+      setMessages(prev => [...prev, botMessage]);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      
+      const errorMessage = {
+        id: Date.now() + 1,
+        role: 'bot',
+        content: "I'm sorry, I'm having trouble connecting right now. Please try again in a moment.",
+        timestamp: new Date().toISOString()
+      };
+
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+      setIsTyping(false);
     }
-    if(currentQuestion === questions.length - 1) {
-      setShowSummary(true);
-    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    sendMessage(inputMessage);
   };
 
   const startVoiceRecording = () => {
-    
-      setIsRecording(true);
-    
-  
-    
-  
-   
+    setIsRecording(true);
+    // For now, we'll simulate voice recording
+    // In a real implementation, you'd integrate with Web Speech API
+    setTimeout(() => {
+      setIsRecording(false);
+      // Simulate voice input
+      const simulatedVoiceInput = "Tell me about government schemes for farmers";
+      sendMessage(simulatedVoiceInput);
+    }, 2000);
   };
-  
 
   const VoiceRecordingAnimation = () => (
-    <div className="flex items-center justify-center space-x-3">
+    <div className="flex items-center justify-center space-x-2">
       <div className="relative">
         <div className={`absolute inset-0 bg-green-400 rounded-full animate-ping ${isRecording ? 'opacity-75' : 'opacity-0'}`}></div>
-        <div className={`relative w-3 h-3 bg-green-500 rounded-full ${isRecording ? 'animate-pulse' : ''}`}></div>
+        <div className={`relative w-2 h-2 bg-green-500 rounded-full ${isRecording ? 'animate-pulse' : ''}`}></div>
       </div>
       <div className="flex space-x-1">
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className={`w-1 bg-green-500 rounded-full transform origin-bottom transition-all duration-300 ${
-              isRecording ? `h-${Math.random() > 0.5 ? '4' : '6'} animate-bounce` : 'h-1'
+            className={`w-0.5 bg-green-500 rounded-full transform origin-bottom transition-all duration-300 ${
+              isRecording ? `h-${Math.random() > 0.5 ? '3' : '4'} animate-bounce` : 'h-1'
             }`}
             style={{ animationDelay: `${i * 100}ms` }}
           ></div>
@@ -249,280 +125,209 @@ const Chatbot = () => {
       </div>
     </div>
   );
-  const TableView = ({ headers, rows, title }) => (
-    <div className="overflow-x-auto">
-      {title && <h4 className="text-green-800 font-medium mb-2">{title}</h4>}
-      <table className="w-full text-m">
-        <thead>
-          <tr>
-            {headers.map((header, idx) => (
-              <th key={idx} className="text-left p-2 bg-green-50 border-b-2 border-green-100">
-                {header}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row, idx) => (
-            <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-green-50/30'}>
-              {row.map((cell, cellIdx) => (
-                <td 
-                  key={cellIdx} 
-                  className={`p-2 ${
-                    idx === rows.length - 1 ? 'font-semibold text-green-800' : ''
-                  }`}
-                >
-                  {cellIdx === 1 && cell !== "Amount (₹)" ? `₹${cell}` : cell}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
 
-  const MetricsView = ({ metrics, title }) => (
-    <div className="mb-4">
-      {title && <h4 className="text-green-800 font-medium mb-2">{title}</h4>}
-      <div className="grid grid-cols-3 gap-4">
-        {metrics.map((metric, idx) => (
-          <div key={idx} className="bg-green-50 p-3 rounded-lg">
-            <div className="text-sm text-green-600">{metric.label}</div>
-            <div className="text-lg font-semibold text-green-800">{metric.value}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
-  const CardsView = ({ items }) => (
-    <div className="grid grid-cols-2 gap-4">
-      {items.map((item, idx) => (
-        <div key={idx} className="bg-white p-4 rounded-lg border-2 border-green-100 hover:border-green-200 transition-colors">
-          <h4 className="text-green-800 font-medium mb-2">{item.title}</h4>
-          <p className="text-gray-600 text-sm mb-3">{item.description}</p>
-          {item.details && (
-            <ul className="space-y-1">
-              {item.details.map((detail, detailIdx) => (
-                <li key={detailIdx} className="flex items-start space-x-2 text-sm">
-                  <div className="w-1 h-1 rounded-full bg-green-500 mt-2 flex-shrink-0" />
-                  <span className="text-gray-700">{detail}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-          {item.action && (
-            <div className="text-green-600 text-sm font-medium mt-2">{item.action}</div>
-          )}
-        </div>
-      ))}
-    </div>
-  );
-
-  const SectionsView = ({ sections }) => (
-    <div className="space-y-4">
-      {sections.map((section, idx) => (
-        <div key={idx}>
-          <h4 className="text-green-800 font-medium mb-2">{section.title}</h4>
-          <ul className="space-y-2">
-            {section.items.map((item, itemIdx) => (
-              <li key={itemIdx} className="flex items-start space-x-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-green-500 mt-2 flex-shrink-0" />
-                <span className="text-gray-700">{item}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </div>
-  );
-
-  const ContentRenderer = ({ content }) => {
-    switch (content.type) {
-      case "table":
-        return <TableView {...content} />;
-      case "metrics":
-        return <MetricsView {...content} />;
-      case "cards":
-        return <CardsView {...content} />;
-      case "sections":
-        return <SectionsView {...content} />;
-      case "multi":
-        return (
-          <div className="space-y-6">
-            {content.sections.map((section, idx) => (
-              <ContentRenderer key={idx} content={section} />
-            ))}
-          </div>
-        );
-      default:
-        return null;
-    }
+  const formatTime = (timestamp) => {
+    return new Date(timestamp).toLocaleTimeString([], { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
   };
 
-  const SummarySection = ({ title, content }) => (
-    <div className="mb-4">
-      <button
-        onClick={() => setExpandedSection(expandedSection === title ? null : title)}
-        className="w-full flex items-center justify-between p-4 bg-green-50 rounded-xl hover:bg-green-100 transition-colors"
-      >
-        <span className="font-semibold text-green-800">{title}</span>
-        {expandedSection === title ? (
-          <ChevronDown className="w-5 h-5 text-green-600" />
-        ) : (
-          <ChevronRight className="w-5 h-5 text-green-600" />
-        )}
-      </button>
-      {expandedSection === title && (
-        <div className="mt-2 p-4 bg-white border-2 border-green-100 rounded-xl">
-          <ContentRenderer content={content} />
+  return (
+    <div className="flex-1 min-h-full max-w-3xl mx-auto p-1">
+      <div className="bg-white rounded-lg shadow-md min-h-full flex flex-col overflow-hidden border border-green-200 relative group">
+        {/* Animated background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-green-50 via-white to-emerald-50 opacity-50 group-hover:opacity-75 transition-opacity duration-500"></div>
+        
+        {/* Floating particles effect */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-4 left-4 w-2 h-2 bg-green-300 rounded-full animate-pulse opacity-60"></div>
+          <div className="absolute top-8 right-6 w-1 h-1 bg-emerald-400 rounded-full animate-ping opacity-40"></div>
+          <div className="absolute bottom-16 left-8 w-1.5 h-1.5 bg-green-200 rounded-full animate-bounce opacity-50"></div>
         </div>
-      )}
-    </div>
-  );
 
-  return (  
-      <div className="flex-1 min-h-full max-w-5xl mx-auto p-4">
-        <div className="bg-white rounded-xl shadow-lg min-h-full flex flex-col overflow-hidden">
-          {/* Chat Header */}
-          <div className="p-6 border-b bg-gradient-to-r from-green-50 to-white">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-                <Bot className="w-6 h-6 text-green-600" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-green-800">Dhan Sarthi</h1>
-                <p className="text-sm text-green-600">Your Personal Financial Guide</p>
-              </div>
+        {/* Enhanced Chat Header */}
+        <div className="p-2 border-b bg-gradient-to-r from-green-500 to-emerald-600 text-white relative z-10 hover:from-green-600 hover:to-emerald-700 transition-all duration-300">
+          <div className="flex items-center space-x-2">
+            <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm hover:bg-white/30 transition-all duration-300 hover:scale-110">
+              <Bot className="w-4 h-4 text-white" />
+            </div>
+            <div className="flex-1">
+              <h1 className="text-sm font-bold flex items-center">
+                Dhan Sarthi
+                <Sparkles className="w-3 h-3 ml-1 text-yellow-300 animate-pulse" />
+              </h1>
+              <p className="text-green-100 text-xs font-medium">Your Personal Financial Guide</p>
+            </div>
+            <div className="flex space-x-1">
+              <div className="w-1.5 h-1.5 bg-green-300 rounded-full animate-pulse"></div>
+              <div className="w-1.5 h-1.5 bg-green-300 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
+              <div className="w-1.5 h-1.5 bg-green-300 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
             </div>
           </div>
+        </div>
 
-          {/* Chat Messages */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-hide">
-            <style>
-              {`
-                .scrollbar-hide::-webkit-scrollbar {
-                  display: none;
-                }
-                .scrollbar-hide {
-                  -ms-overflow-style: none;
-                  scrollbar-width: none;
-                }
-              `}
-            </style>
-            {responses.map((response, idx) => (
-              <div key={idx} className="space-y-4">
-                <div className="flex items-start space-x-3">
-                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                    <Bot className="w-5 h-5 text-green-600" />
-                  </div>
-                  <div className="bg-green-50 p-4 rounded-2xl rounded-tl-none max-w-[80%]">
-                    <p className="text-green-800">{response.question}</p>
-                  </div>
+        {/* Chat Messages */}
+        <div className="flex-1 overflow-y-auto p-2 space-y-2 scrollbar-hide bg-gradient-to-b from-gray-50 to-white relative z-10">
+          <style>
+            {`
+              .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+              }
+              .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+              }
+              .animate-fade-in {
+                animation: fadeIn 0.5s ease-in-out;
+              }
+              @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+              }
+              .message-hover {
+                transition: all 0.3s ease;
+              }
+              .message-hover:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15);
+              }
+              .typing-dots {
+                display: inline-block;
+              }
+              .typing-dots::after {
+                content: '';
+                animation: typing 1.5s infinite;
+              }
+              @keyframes typing {
+                0%, 20% { content: ''; }
+                40% { content: '.'; }
+                60% { content: '..'; }
+                80%, 100% { content: '...'; }
+              }
+            `}
+          </style>
+          
+          {messages.map((message) => (
+            <div key={message.id} className={`flex items-start space-x-2 animate-fade-in message-hover ${
+              message.role === 'user' ? 'justify-end' : ''
+            }`}>
+              {message.role === 'bot' && (
+                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center flex-shrink-0 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110">
+                  <Bot className="w-3 h-3 text-white" />
                 </div>
-                <div className="flex items-start space-x-3 justify-end">
-                  <div className="bg-white border-2 border-green-200 p-4 rounded-2xl rounded-tr-none max-w-[80%]">
-                    <p className="text-gray-800">{response.answer}</p>
-                  </div>
-                  <div className="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center flex-shrink-0">
-                    <User className="w-5 h-5 text-white" />
-                  </div>
-                </div>
+              )}
+              
+              <div className={`max-w-[85%] p-2 rounded-lg shadow-sm border transition-all duration-300 ${
+                message.role === 'user' 
+                  ? 'bg-gradient-to-br from-green-500 to-emerald-600 text-white rounded-tr-none hover:from-green-600 hover:to-emerald-700' 
+                  : 'bg-white border-green-100 rounded-tl-none hover:border-green-200 hover:shadow-md'
+              }`}>
+                <p className={`text-xs font-medium ${
+                  message.role === 'user' ? 'text-white' : 'text-gray-800'
+                }`}>
+                  {message.content}
+                </p>
+                <p className={`text-xs mt-1 ${
+                  message.role === 'user' ? 'text-green-100' : 'text-gray-500'
+                }`}>
+                  {formatTime(message.timestamp)}
+                </p>
               </div>
-            ))}
+              
+              {message.role === 'user' && (
+                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center flex-shrink-0 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110">
+                  <User className="w-3 h-3 text-white" />
+                </div>
+              )}
+            </div>
+          ))}
 
-            {/* Current Question */}
-            {currentQuestion < questions.length && (
-              <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                  <Bot className="w-5 h-5 text-green-600" />
-                </div>
-                <div className="bg-green-50 p-4 rounded-2xl rounded-tl-none max-w-[80%] animate-fadeIn">
-                  <p className="text-green-800">{questions[currentQuestion].text}</p>
-                </div>
+          {/* Enhanced Loading indicator */}
+          {isLoading && (
+            <div className="flex items-start space-x-2 animate-fade-in">
+              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center flex-shrink-0 shadow-md animate-pulse">
+                <Bot className="w-3 h-3 text-white" />
               </div>
-            )}
-
-{showSummary && (
-            <div className="space-y-4 animate-fadeIn">
-              <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                  <Bot className="w-5 h-5 text-green-600" />
-                </div>
-                <div className="bg-green-50 p-4 rounded-2xl rounded-tl-none w-full">
-                  <h3 className="text-lg font-semibold text-green-800 mb-4">
-                    Based on your responses, here's my detailed analysis:
-                  </h3>
-                  <div className="space-y-2">
-                    {Object.entries(summaryData).map(([key, section]) => (
-                      <SummarySection
-                        key={key}
-                        title={section.title}
-                        content={section.content}
-                      />
-                    ))}
-                  </div>
+              <div className="bg-white p-2 rounded-lg rounded-tl-none shadow-sm border border-green-100 hover:shadow-md transition-all duration-300">
+                <div className="flex items-center space-x-2">
+                  <Loader2 className="w-3 h-3 text-green-600 animate-spin" />
+                  <p className="text-xs text-gray-600">
+                    Dhan Sarthi is typing<span className="typing-dots"></span>
+                  </p>
                 </div>
               </div>
             </div>
           )}
-            <div ref={messagesEndRef} />
-          </div>
 
-          {/* Input Area */}
-          <div className="border-t p-6 bg-gradient-to-r from-green-50 to-white">
-            {currentQuestion < questions.length && (
-              <div className="space-y-4">
-                {questions[currentQuestion].type === "options" && (
-                  <div className="grid grid-cols-2 gap-3">
-                    {questions[currentQuestion].options.map((option) => (
-                      <button
-                        key={option}
-                        onClick={() => handleOptionSelect(option)}
-                        className="p-3 text-green-700 border-2 border-green-400 rounded-xl hover:bg-green-50 transition-all duration-300 hover:scale-105 active:scale-95"
-                      >
-                        {option}
-                      </button>
-                    ))}
-                  </div>
-                )}
-                {(questions[currentQuestion].type === "voice" || questions[currentQuestion].hasVoice) && (
-                  <div className="flex items-center space-x-4 bg-green-50 p-4 rounded-xl">
-                    <button
-                      onClick={startVoiceRecording}
-                      className={`p-3 rounded-full transition-all duration-300 ${
-                        isRecording 
-                          ? 'bg-red-100 text-red-500 animate-pulse' 
-                          : 'bg-green-100 text-green-600 hover:bg-green-200'
-                      }`}
-                    >
-                      <Mic className="w-6 h-6" />
-                    </button>
-                    <div className="flex-1">
-                      {isRecording ? (
-                        <VoiceRecordingAnimation />
-                      ) : (
-                        <div className="flex items-center text-sm text-green-600">
-                          <Volume2 className="w-4 h-4 mr-2" />
-                          {questions[currentQuestion].voicePrompt}
-                        </div>
-                      )}
-                    </div>
-                    {isRecording && <button 
-                        onClick={stopRecording }
-                        className='bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all duration-300'
-                      >
-                        Stop Recording
-                      </button>}
-                  </div>
-                )}
-              </div>
-            )}
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Enhanced Input Area */}
+        <div className="border-t border-green-200 p-2 bg-gradient-to-r from-green-50 to-emerald-50 relative z-10">
+          <form onSubmit={handleSubmit} className="flex items-center space-x-2">
+            <button
+              type="button"
+              onClick={startVoiceRecording}
+              disabled={isLoading || isRecording}
+              className={`p-1.5 rounded-full transition-all duration-300 shadow-sm hover:shadow-md ${
+                isRecording 
+                  ? 'bg-red-100 text-red-500 animate-pulse shadow-lg scale-110' 
+                  : 'bg-green-100 text-green-600 hover:bg-green-200 hover:scale-105 disabled:opacity-50'
+              }`}
+            >
+              <Mic className="w-3 h-3" />
+            </button>
+            
+            <div className="flex-1 relative group">
+              <input
+                type="text"
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                placeholder="Ask me about finance, investments, government schemes..."
+                disabled={isLoading || isRecording}
+                className="w-full p-1.5 pr-8 text-xs border border-green-300 rounded-md focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-400 focus:ring-opacity-50 disabled:opacity-50 transition-all duration-300 group-hover:border-green-400"
+              />
+              {isRecording && (
+                <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                  <VoiceRecordingAnimation />
+                </div>
+              )}
+              {/* Input focus effect */}
+              <div className="absolute inset-0 rounded-md bg-gradient-to-r from-green-400 to-emerald-500 opacity-0 group-focus-within:opacity-10 transition-opacity duration-300 pointer-events-none"></div>
+            </div>
+            
+            <button
+              type="submit"
+              disabled={!inputMessage.trim() || isLoading || isRecording}
+              className="p-1.5 bg-green-500 text-white rounded-full hover:bg-green-600 transition-all duration-300 shadow-sm hover:shadow-md hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            >
+              <Send className="w-3 h-3" />
+            </button>
+          </form>
+          
+          {/* Enhanced Quick suggestions */}
+          <div className="mt-2 flex flex-wrap gap-1">
+            {[
+              "Government schemes",
+              "Investment advice",
+              "How to save money?",
+              "Tax saving tips"
+            ].map((suggestion, index) => (
+              <button
+                key={suggestion}
+                onClick={() => sendMessage(suggestion)}
+                disabled={isLoading || isRecording}
+                className="px-2 py-0.5 text-xs bg-white border border-green-300 rounded-full hover:bg-green-50 hover:border-green-400 hover:shadow-sm transition-all duration-300 disabled:opacity-50 hover:scale-105"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                {suggestion}
+              </button>
+            ))}
           </div>
         </div>
       </div>
-    
+    </div>
   );
 };
 
