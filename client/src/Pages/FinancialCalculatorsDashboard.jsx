@@ -22,17 +22,22 @@ const CalculatorCard = ({ icon, title, description, onClick }) => {
   return (
     <div 
       onClick={onClick}
-      className="bg-white hover:bg-green-50 transition-all duration-300 rounded-xl shadow-md p-6 cursor-pointer group border border-gray-100 hover:border-green-200 hover:shadow-lg- transform hover:scale-105"
+      className="bg-white/70 backdrop-blur-md hover:bg-green-50/80 transition-all duration-300 rounded-2xl shadow-xl p-8 cursor-pointer group border border-green-100 hover:border-green-300 hover:shadow-2xl transform hover:scale-105 animate-pop-in"
+      style={{ minHeight: 220 }}
     >
       <div className="flex items-center mb-4">
-        <span className="text-4xl mr-4">{icon}</span>
-        <h3 className="text-xl font-semibold text-gray-800 group-hover:text-green-600">
+        <span className="w-14 h-14 flex items-center justify-center rounded-full bg-gradient-to-br from-green-200 to-emerald-200 text-4xl mr-4 shadow-lg">
+          {icon}
+        </span>
+        <h3 className="text-2xl font-bold text-green-800 group-hover:text-green-600 transition-colors">
           {title}
         </h3>
       </div>
-      <p className="text-gray-600 mb-4">{description}</p>
+      <p className="text-gray-700 mb-4 text-base leading-relaxed">
+        {description}
+      </p>
       <div className="flex justify-end">
-        <span className="text-green-500 font-medium group-hover:translate-x-1 transition-transform">
+        <span className="text-green-500 font-semibold group-hover:translate-x-1 transition-transform">
           Calculate →
         </span>
       </div>
@@ -119,14 +124,14 @@ const FinancialCalculatorsDashboard = () => {
 
   // Default view: Calculator Cards
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-tr from-green-100 to-white mt-11">
+    <div className="flex flex-col min-h-screen bg-gradient-to-tr from-green-100 via-white to-emerald-50 mt-11">
       <NavBar language={language} toggleLanguage={() => setLanguage(language === 'en' ? 'hi' : 'en')} />
       <div className="flex-grow p-8">
         <div className="container mx-auto">
-          <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">
-            Financial Calculators
-          </h1>
-          <div className="grid md:grid-cols-3 gap-6">
+          <h1 className="text-4xl font-extrabold text-green-800 mb-2 text-center drop-shadow-lg animate-fade-in">Financial Calculators</h1>
+          <p className="text-lg text-green-700 mb-8 text-center animate-fade-in-slow">Plan, calculate, and optimize your finances with our suite of smart calculators.</p>
+          <div className="w-full h-1 bg-gradient-to-r from-green-200 via-emerald-200 to-green-100 rounded-full mb-10 opacity-60 animate-fade-in-slow"></div>
+          <div className="grid md:grid-cols-3 gap-10 animate-fade-in">
             {calculators.map((calculator) => (
               <CalculatorCard
                 key={calculator.id}

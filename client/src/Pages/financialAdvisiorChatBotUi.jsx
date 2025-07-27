@@ -20,6 +20,7 @@ export default function FinancialAdvisorChatbotUi() {
     financial_goal: "",
     risk_tolerance: "low",
   });
+  const [errors, setErrors] = useState({});
   const [businessTypes, setBusinessTypes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [advice, setAdvice] = useState(null);
@@ -39,13 +40,57 @@ export default function FinancialAdvisorChatbotUi() {
       .catch((error) => console.error("Error fetching business types:", error));
   }, []);
 
+  // Validation function for positive numbers
+  const validatePositiveNumber = (value, fieldName) => {
+    const num = parseFloat(value);
+    if (value === "") return "";
+    if (isNaN(num)) return `${fieldName} must be a valid number`;
+    if (num <= 0) return `${fieldName} must be greater than 0`;
+    if (num > 999999999) return `${fieldName} is too large`;
+    return "";
+  };
+
+  // Validation function for age
+  const validateAge = (value) => {
+    const num = parseFloat(value);
+    if (value === "") return "";
+    if (isNaN(num)) return "Age must be a valid number";
+    if (num <= 0) return "Age must be greater than 0";
+    if (num < 18) return "Age must be at least 18 years";
+    if (num > 120) return "Age must be less than 120 years";
+    return "";
+  };
+
   useEffect(() => {
+    // Validate form fields
+    const newErrors = {};
+    
+    // Validate age
+    newErrors.age = validateAge(formData.age);
+    
+    // Validate monthly income
+    newErrors.monthly_income = validatePositiveNumber(formData.monthly_income, "Monthly income");
+    
+    // Validate family size
+    newErrors.family_size = validatePositiveNumber(formData.family_size, "Family size");
+    
+    // Validate existing savings
+    newErrors.existing_savings = validatePositiveNumber(formData.existing_savings, "Existing savings");
+    
+    setErrors(newErrors);
+
+    // Check if form is valid
     const isValid =
       formData.name.trim() !== "" &&
       formData.age > 0 &&
       formData.monthly_income > 0 &&
-      formData.location.trim() !== "";
+      formData.family_size > 0 &&
+      formData.existing_savings >= 0 && // Allow 0 for savings
+      formData.location.trim() !== "" &&
+      Object.values(newErrors).every(error => error === "");
+
     setFormValid(isValid);
+    
     // Calculate progress (fields filled / total fields)
     const total = 10;
     let filled = 0;
@@ -111,7 +156,24 @@ export default function FinancialAdvisorChatbotUi() {
   }
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    
+    // For number fields, only allow positive numbers
+    if (['age', 'monthly_income', 'family_size', 'existing_savings'].includes(name)) {
+      // Remove any non-numeric characters except decimal point
+      const cleanValue = value.replace(/[^0-9.]/g, '');
+      
+      // Prevent multiple decimal points
+      const parts = cleanValue.split('.');
+      if (parts.length > 2) return;
+      
+      // Limit decimal places to 2
+      if (parts.length === 2 && parts[1].length > 2) return;
+      
+      setFormData({ ...formData, [name]: cleanValue });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -193,31 +255,43 @@ export default function FinancialAdvisorChatbotUi() {
           </div>
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Full Name"
+                  required
+                  className={`p-3 border rounded-lg w-full focus:ring-2 focus:ring-green-500 ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
+                  onChange={handleChange}
+                />
+                {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+              </div>
+              <div>
+                <input
+                  type="number"
+                  name="age"
+                  placeholder="Age"
+                  min="18"
+                  max="120"
+                  step="1"
+                  required
+                  className={`p-3 border rounded-lg w-full focus:ring-2 focus:ring-green-500 ${errors.age ? 'border-red-500' : 'border-gray-300'}`}
+                  onChange={handleChange}
+                />
+                {errors.age && <p className="text-red-500 text-xs mt-1">{errors.age}</p>}
+              </div>
+            </div>
+            <div>
               <input
                 type="text"
-                name="name"
-                placeholder="Full Name"
+                name="location"
+                placeholder="Location"
                 required
-                className="p-3 border rounded-lg w-full focus:ring-2 focus:ring-green-500"
+                className={`p-3 border rounded-lg w-full focus:ring-2 focus:ring-green-500 ${errors.location ? 'border-red-500' : 'border-gray-300'}`}
                 onChange={handleChange}
               />
-              <input
-                type="number"
-                name="age"
-                placeholder="Age"
-                required
-                className="p-3 border rounded-lg w-full focus:ring-2 focus:ring-green-500"
-                onChange={handleChange}
-              />
+              {errors.location && <p className="text-red-500 text-xs mt-1">{errors.location}</p>}
             </div>
-            <input
-              type="text"
-              name="location"
-              placeholder="Location"
-              required
-              className="p-3 border rounded-lg w-full focus:ring-2 focus:ring-green-500"
-              onChange={handleChange}
-            />
             <select
               name="preferred_language"
               required
@@ -231,22 +305,32 @@ export default function FinancialAdvisorChatbotUi() {
               <option value="Gujarati">Gujarati</option>
             </select>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <input
-                type="number"
-                name="monthly_income"
-                placeholder="Monthly Income (₹)"
-                required
-                className="p-3 border rounded-lg w-full focus:ring-2 focus:ring-green-500"
-                onChange={handleChange}
-              />
-              <input
-                type="number"
-                name="family_size"
-                placeholder="Family Size"
-                required
-                className="p-3 border rounded-lg w-full focus:ring-2 focus:ring-green-500"
-                onChange={handleChange}
-              />
+              <div>
+                <input
+                  type="number"
+                  name="monthly_income"
+                  placeholder="Monthly Income (₹)"
+                  min="1"
+                  step="0.01"
+                  required
+                  className={`p-3 border rounded-lg w-full focus:ring-2 focus:ring-green-500 ${errors.monthly_income ? 'border-red-500' : 'border-gray-300'}`}
+                  onChange={handleChange}
+                />
+                {errors.monthly_income && <p className="text-red-500 text-xs mt-1">{errors.monthly_income}</p>}
+              </div>
+              <div>
+                <input
+                  type="number"
+                  name="family_size"
+                  placeholder="Family Size"
+                  min="1"
+                  step="1"
+                  required
+                  className={`p-3 border rounded-lg w-full focus:ring-2 focus:ring-green-500 ${errors.family_size ? 'border-red-500' : 'border-gray-300'}`}
+                  onChange={handleChange}
+                />
+                {errors.family_size && <p className="text-red-500 text-xs mt-1">{errors.family_size}</p>}
+              </div>
             </div>
             <select
               name="business_type"
@@ -261,14 +345,19 @@ export default function FinancialAdvisorChatbotUi() {
                 </option>
               ))}
             </select>
-            <input
-              type="number"
-              name="existing_savings"
-              placeholder="Existing Savings (₹)"
-              required
-              className="p-3 border rounded-lg w-full focus:ring-2 focus:ring-green-500"
-              onChange={handleChange}
-            />
+            <div>
+              <input
+                type="number"
+                name="existing_savings"
+                placeholder="Existing Savings (₹)"
+                min="0"
+                step="0.01"
+                required
+                className={`p-3 border rounded-lg w-full focus:ring-2 focus:ring-green-500 ${errors.existing_savings ? 'border-red-500' : 'border-gray-300'}`}
+                onChange={handleChange}
+              />
+              {errors.existing_savings && <p className="text-red-500 text-xs mt-1">{errors.existing_savings}</p>}
+            </div>
             <textarea
               name="financial_goal"
               placeholder="Your Financial Goals"
@@ -311,7 +400,7 @@ export default function FinancialAdvisorChatbotUi() {
         {/* Right Sidebar with Illustration and Quote */}
         <div className="hidden md:flex flex-col items-center justify-center w-96 min-h-[32rem] p-8 bg-white/80 rounded-2xl shadow-xl border border-green-100 animate-fade-in">
           <img src={advisorImg} alt="Advisor" className="w-32 h-32 rounded-full shadow mb-6 border-4 border-green-200 object-cover" />
-          <blockquote className="text-lg text-green-800 italic text-center mb-4">“The best way to predict your future is to create it.”</blockquote>
+          <blockquote className="text-lg text-green-800 italic text-center mb-4">"The best way to predict your future is to create it."</blockquote>
           <div className="text-green-600 text-sm text-center">Your trusted financial partner for rural growth.</div>
         </div>
       </div>
