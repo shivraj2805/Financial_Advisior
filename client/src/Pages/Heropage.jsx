@@ -28,6 +28,7 @@ import {
 import Features from "../components/Features";
 import NavBar from "../components/NavBar"; // Import NavBar
 import Footer from "../components/Footer";
+import "../LandingPage/Hero/Hero.css";
 
 const translations = {
   en: {
@@ -135,18 +136,18 @@ const translations = {
           link: "/advisor",
           icon: Bot,
         },
-        {
-          title: "Learning Center",
-          description: "Access courses and educational content",
-          link: "/learn",
-          icon: BookOpen,
-        },
-        {
-          title: "Roadmap",
-          description: "Explore a tailored roadmap to financial success",
-          link: "/road",
-          icon: Map,
-        },
+        // {
+        //   title: "Learning Center",
+        //   description: "Access courses and educational content",
+        //   link: "/learn",
+        //   icon: BookOpen,
+        // },
+        // {
+        //   title: "Roadmap",
+        //   description: "Explore a tailored roadmap to financial success",
+        //   link: "/road",
+        //   icon: Map,
+        // },
         {
           title: "Microinvestment Opportunities",
           description: "Explore the latest investment opportunities for small investors",
@@ -183,12 +184,12 @@ const translations = {
           link: "/stories",
           icon: Award,
         },
-        {
-          title: "Women's Portal",
-          description: "Empowering women through financial independence and support",
-          link: "/womens",
-          icon: Users,
-        },
+        // {
+        //   title: "Women's Portal",
+        //   description: "Empowering women through financial independence and support",
+        //   link: "/womens",
+        //   icon: Users,
+        // },
         {
           title: "OCR Based Finance Doc Reading",
           description: "Scan and understand financial documents with AI-powered OCR",
@@ -535,10 +536,71 @@ const BusinessIdeasScroll = ({ ideas }) => {
   );
 };
 
+const SNAKE_LENGTH = 18;
+
 const LandingPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [language, setLanguage] = useState("en");
   const t = translations[language];
+
+  // Cursor and snake trail logic
+  const cursorRef = useRef(null);
+  const snakeTrailRef = useRef(Array(SNAKE_LENGTH).fill({ x: window.innerWidth / 2, y: window.innerHeight / 2 }));
+  const [snakeTrail, setSnakeTrail] = useState(snakeTrailRef.current);
+
+  useEffect(() => {
+    const cursor = cursorRef.current;
+    let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    let animationFrame;
+    const moveCursor = (e) => {
+      mouse = { x: e.clientX, y: e.clientY };
+      if (cursor) {
+        cursor.style.left = mouse.x + "px";
+        cursor.style.top = mouse.y + "px";
+      }
+    };
+    const animateSnake = () => {
+      setSnakeTrail((prev) => {
+        const newTrail = [...prev];
+        newTrail[0] = { ...mouse };
+        for (let i = 1; i < SNAKE_LENGTH; i++) {
+          newTrail[i] = {
+            x: newTrail[i].x + (newTrail[i - 1].x - newTrail[i].x) * 0.5,
+            y: newTrail[i].y + (newTrail[i - 1].y - newTrail[i].y) * 0.5,
+          };
+        }
+        return newTrail;
+      });
+      animationFrame = requestAnimationFrame(animateSnake);
+    };
+    animateSnake();
+    window.addEventListener("mousemove", moveCursor);
+    return () => {
+      window.removeEventListener("mousemove", moveCursor);
+      cancelAnimationFrame(animationFrame);
+    };
+  }, []);
+
+  // SVG lines for snake effect
+  const lines = [];
+  for (let i = 1; i < snakeTrail.length; i++) {
+    const p1 = snakeTrail[i - 1];
+    const p2 = snakeTrail[i];
+    lines.push(
+      <line
+        key={i}
+        x1={p1.x}
+        y1={p1.y}
+        x2={p2.x}
+        y2={p2.y}
+        stroke="url(#snake-gradient)"
+        strokeWidth={16 - i * 0.7}
+        opacity={0.10 + 0.4 * (1 - i / SNAKE_LENGTH)}
+        strokeLinecap="round"
+        className="snake-line"
+      />
+    );
+  }
 
   const toggleLanguage = () => {
     setLanguage((prev) => (prev === "en" ? "hi" : "en"));
@@ -546,34 +608,42 @@ const LandingPage = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-white">
-        <NavBar language={language} toggleLanguage={toggleLanguage} t={t.nav} />{" "}
-        {/* Use NavBar */}
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-white relative overflow-x-hidden">
+        {/* Custom Cursor & Snake Trail */}
+        <div ref={cursorRef} className="custom-cursor" />
+        <svg className="snake-svg-lines" width={window.innerWidth} height={window.innerHeight}>
+          <defs>
+            <linearGradient id="snake-gradient" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#fff" stopOpacity="0.8" />
+              <stop offset="60%" stopColor="#bbf7d0" stopOpacity="0.7" />
+              <stop offset="100%" stopColor="#22c55e" stopOpacity="0.5" />
+            </linearGradient>
+          </defs>
+          {lines}
+        </svg>
+        {snakeTrail.map((pos, idx) => (
+          <div
+            key={idx}
+            className="snake-dot"
+            style={{
+              left: pos.x + "px",
+              top: pos.y + "px",
+              opacity: 0.35 * (1 - idx / SNAKE_LENGTH),
+              zIndex: 9995,
+              width: 28 - idx + "px",
+              height: 28 - idx + "px",
+              background: `radial-gradient(circle at 40% 40%, #fff 70%, #bbf7d0 90%, #22c55e 100%)`,
+              filter: `blur(${2 + idx * 1.1}px)`
+            }}
+          />
+        ))}
+        <NavBar language={language} toggleLanguage={toggleLanguage} t={t.nav} />
         <header className="text-center pt-24">
           <h1 className="text-4xl font-bold text-green-800">{t.hero.title}</h1>
           <p className="mt-4 text-green-600">{t.hero.subtitle}</p>
-          {/* <button className="mt-6 px-8 py-3 bg-green-500 text-white font-semibold rounded-lg">
-            {t.hero.cta}
-          </button> */}
         </header>
         <Features t={t.features} />
-        {/* <section className="py-12 bg-white text-center">
-          <h2 className="text-2xl font-bold text-green-800">
-            {t.businessIdeas.title}
-          </h2>
-          <p className="mt-2 text-green-600">{t.businessIdeas.subtitle}</p>
-          <BusinessIdeasScroll ideas={t.businessIdeas.ideas} />
-        </section>
-        <section className="py-12 bg-gradient-to-br from-green-100 to-green-50">
-          <h2 className="text-2xl font-bold text-green-800 text-center">
-            {t.successStories.title}
-          </h2>
-          <p className="mt-2 text-green-600 text-center">
-            {t.successStories.subtitle}
-          </p>
-          <SuccessStoryTimeline steps={t.successStories.steps} />
-        </section>
-        <Footer /> */}
+        {/* All sections flow naturally, no scroll snap or sticky */}
       </div>
     </>
   );

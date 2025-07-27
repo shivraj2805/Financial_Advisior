@@ -12,7 +12,7 @@ import ErrorPage from "./components/ErrorPage";
 import GovernmentSchemes from "./Pages/GovernmentScheme";
 // import PPFCalculator from "./Pages/PpfCalculator";
 import PPFCalculator from "./Pages/FinancialCalculatorsDashboard";
-import WomenEmpowerment from "./Pages/WomensSection";
+// import WomenEmpowerment from "./Pages/WomensSection";
 import ChatbotButton from "./components/ChatbobtButton";
 import MicroinvestmentPlatform from "./Pages/mip";
 import PoultryFarmGuide from "./Pages/poultry";
@@ -55,7 +55,7 @@ function App() {
         <Route path="/shorts" element={<ProtectedRoute><YouTubeShorts /></ProtectedRoute>} />
         <Route path="/scheme" element={<ProtectedRoute><GovernmentSchemes /></ProtectedRoute>} />
         <Route path="/ppf" element={<PPFCalculator /> }/>
-        <Route path="/womens" element={<ProtectedRoute><WomenEmpowerment /></ProtectedRoute>} />
+        {/* <Route path="/womens" element={<ProtectedRoute><WomenEmpowerment /></ProtectedRoute>} /> */}
         <Route path="/mip" element={<ProtectedRoute><MicroinvestmentPlatform /></ProtectedRoute>} />
         <Route path="/poultry" element={<ProtectedRoute><PoultryFarmGuide /></ProtectedRoute>} />
         <Route path="/rural" element={<ProtectedRoute><RuralBusinessOpportunities /></ProtectedRoute>} />
