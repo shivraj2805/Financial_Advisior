@@ -12,6 +12,7 @@ const addRoutes = require("./routes/add");
 const communityRoutes = require('./routes/community');
 const successStoriesRoutes = require("./routes/successStories")
 const schemesRoutes = require("./routes/schemeRoutes");
+const ocrRoutes = require("./routes/ocr");
 
 const app = express();
 const http = require('http').createServer(app);
@@ -21,6 +22,9 @@ const PORT = process.env.PORT || 8080;
 // Allow both local and production frontend URLs
 const allowedOrigins = [
   "http://localhost:3000",
+  "http://localhost:8080",
+  "http://127.0.0.1:3000",
+  "http://127.0.0.1:8080",
   "https://finadvisior.vercel.app",
   "https://finadvisorapp.vercel.app"
 ];
@@ -29,7 +33,13 @@ app.use(cors({
   origin: function (origin, callback) {
     console.log("Request Origin:", origin);
 
+    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
+
+    // Allow all localhost requests for development
+    if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      return callback(null, true);
+    }
 
     if (
       allowedOrigins.includes(origin) ||
@@ -38,6 +48,7 @@ app.use(cors({
     ) {
       return callback(null, true);
     } else {
+      console.log("CORS blocked origin:", origin);
       return callback(new Error("Not allowed by CORS"));
     }
   },
@@ -45,7 +56,6 @@ app.use(cors({
 }));
 
 app.use(bodyParser.json());
-
 
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -56,6 +66,7 @@ app.use("/api/add", addRoutes);
 app.use('/api/communities', communityRoutes);
 app.use("/api/success-stories",successStoriesRoutes );
 app.use("/api/schemes", schemesRoutes);
+app.use("/api/ocr", ocrRoutes);
 
 app.get("/ping", (req, res) => {
   res.send("Hello Server");
