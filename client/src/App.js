@@ -22,6 +22,7 @@ import DiscussionForums from "./Pages/community";
 import DairyForumPage from "./Pages/dairyforum";
 import SuccessStories from "./Pages/SuccessStoriesAvi";
 import QASessions from "./Pages/qna";
+import DocOCR from "./Pages/docOCR";
 
 import LoginPage from "./Pages/Login";
 import RegistrationPage from "./Pages/Signup";
@@ -68,6 +69,7 @@ function App() {
         <Route path="/qna" element={<ProtectedRoute><QASessions /></ProtectedRoute>} />
 
         <Route path="/advisor" element={<ProtectedRoute><FinancialAdvisorChatbotUi /></ProtectedRoute>} />
+        <Route path="/ocr" element={<ProtectedRoute><DocOCR /></ProtectedRoute>} />
 
 
         <Route path="*" element={<ErrorPage />} />
