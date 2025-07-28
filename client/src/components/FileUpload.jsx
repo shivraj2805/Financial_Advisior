@@ -30,25 +30,85 @@ const FileUpload = ({ onOcrText, onFileChange, onError }) => {
     formData.append('file', file);
 
     try {
+      console.log('Uploading file:', file.name, 'Size:', file.size, 'Type:', file.type);
+      
       const response = await fetch('/api/ocr/upload-financial-doc', {
         method: 'POST',
         body: formData,
       });
 
-      const data = await response.json();
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
+      // Check if response is ok before trying to parse JSON
       if (!response.ok) {
-        const errorMsg = data.error || data.details || 'Upload failed';
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch (parseError) {
+          console.error('Failed to parse error response:', parseError);
+          errorData = { error: `HTTP ${response.status}: ${response.statusText}` };
+        }
+        
+        const errorMsg = errorData.error || errorData.details || `Upload failed (${response.status})`;
         setError(errorMsg);
         if (onError) onError(errorMsg);
-        throw new Error(errorMsg);
+        return;
       }
 
+      // Try to parse the response as JSON
+      let data;
+      try {
+        const responseText = await response.text();
+        console.log('Response text length:', responseText.length);
+        console.log('Response text preview:', responseText.substring(0, 200));
+        
+        if (!responseText || responseText.trim() === '') {
+          throw new Error('Empty response from server');
+        }
+        
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('JSON parse error:', parseError);
+        console.error('Response text:', await response.text());
+        const errorMsg = 'Invalid response from server. Please try again.';
+        setError(errorMsg);
+        if (onError) onError(errorMsg);
+        return;
+      }
+
+      // Validate the response structure
+      if (!data || typeof data !== 'object') {
+        const errorMsg = 'Invalid response format from server';
+        setError(errorMsg);
+        if (onError) onError(errorMsg);
+        return;
+      }
+
+      if (!data.json) {
+        const errorMsg = 'Missing analysis data in response';
+        setError(errorMsg);
+        if (onError) onError(errorMsg);
+        return;
+      }
+
+      console.log('Successfully parsed response:', data);
       setSuccess('Document processed successfully!');
       onOcrText(data.json, data.summary);
+      
     } catch (error) {
       console.error('Upload error:', error);
-      const errorMsg = error.message;
+      let errorMsg = error.message;
+      
+      // Provide more specific error messages
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        errorMsg = 'Network error. Please check your connection and try again.';
+      } else if (error.message.includes('JSON')) {
+        errorMsg = 'Server response error. Please try again.';
+      } else if (error.message.includes('timeout')) {
+        errorMsg = 'Request timed out. Please try again.';
+      }
+      
       setError(errorMsg);
       if (onError) onError(errorMsg);
     } finally {

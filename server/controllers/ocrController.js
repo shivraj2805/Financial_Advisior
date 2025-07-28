@@ -308,13 +308,6 @@ async function runOCR(filePath, mimetype) {
 }
 
 /**
- * Basic financial analysis without OpenAI
- * @param {string} ocrText
- * @returns {object}
- */
-
-
-/**
  * Run LLM to extract financial data from OCR text.
  * @param {string} ocrText
  * @returns {Promise<{json: object, summary: string}>}
@@ -333,7 +326,8 @@ const runFinancialExtraction = async (ocrText) => {
           financialKeywords: extractFinancialKeywords(ocrText),
           potentialAmounts: extractAmounts(ocrText),
           dates: extractDates(ocrText),
-          lineCount: ocrText.split('\n').length
+          lineCount: ocrText.split('\n').length,
+          summary: 'AI analysis not available. Using basic extraction.'
         }
       };
     }
@@ -428,7 +422,16 @@ const runFinancialExtraction = async (ocrText) => {
     - Make sure the JSON is valid and complete
     `;
 
+    console.log('Sending request to Gemini API...');
     const response = await geminiClient(prompt);
+    
+    console.log('Gemini response received, length:', response ? response.length : 0);
+    
+    // Check if response is empty or null
+    if (!response || response.trim() === '') {
+      console.error('Empty response from Gemini API');
+      throw new Error('Empty response from AI service');
+    }
     
     // Try to parse the response as JSON
     let parsedResponse;
@@ -443,21 +446,12 @@ const runFinancialExtraction = async (ocrText) => {
     } catch (parseError) {
       console.error('Failed to parse Gemini response as JSON:', parseError);
       console.log('Raw response:', response);
-      // Fallback to basic analysis
-      return {
-        documentType: 'Financial Document',
-        wordCount: ocrText.split(/\s+/).length,
-        characterCount: ocrText.length,
-        confidence: 'Basic Analysis (JSON Parse Failed)',
-        extractedText: ocrText,
-        analysis: {
-          financialKeywords: extractFinancialKeywords(ocrText),
-          potentialAmounts: extractAmounts(ocrText),
-          dates: extractDates(ocrText),
-          lineCount: ocrText.split('\n').length,
-          summary: 'AI analysis failed, using basic extraction'
-        }
-      };
+      throw new Error('Invalid JSON response from AI service');
+    }
+
+    // Validate the parsed response structure
+    if (!parsedResponse || typeof parsedResponse !== 'object') {
+      throw new Error('Invalid response structure from AI service');
     }
 
     // Ensure the response has the required structure
@@ -468,6 +462,23 @@ const runFinancialExtraction = async (ocrText) => {
     // Add extracted text if not present
     if (!parsedResponse.extractedText) {
       parsedResponse.extractedText = ocrText;
+    }
+
+    // Ensure all required fields are present
+    if (!parsedResponse.documentType) {
+      parsedResponse.documentType = 'Financial Document';
+    }
+    
+    if (!parsedResponse.wordCount) {
+      parsedResponse.wordCount = ocrText.split(/\s+/).length;
+    }
+    
+    if (!parsedResponse.characterCount) {
+      parsedResponse.characterCount = ocrText.length;
+    }
+    
+    if (!parsedResponse.confidence) {
+      parsedResponse.confidence = 'Medium';
     }
 
     return parsedResponse;
@@ -517,10 +528,15 @@ exports.handleUpload = async (req, res) => {
     });
 
     console.log('✅ Financial extraction completed');
-    res.json({
+    
+    // Ensure we always return a valid JSON response
+    const response = {
       json: result,
       summary: result.analysis?.summary || `Successfully extracted ${result.wordCount} words from the document.`
-    });
+    };
+    
+    console.log('Sending response:', JSON.stringify(response, null, 2));
+    res.json(response);
 
   } catch (error) {
     console.error('❌ Upload error:', error);
@@ -532,9 +548,25 @@ exports.handleUpload = async (req, res) => {
       });
     }
 
+    // Always return a valid JSON response even on error
     res.status(500).json({ 
       error: 'Upload failed', 
-      details: error.message 
+      details: error.message,
+      json: {
+        documentType: 'Error',
+        wordCount: 0,
+        characterCount: 0,
+        confidence: 'Error',
+        extractedText: '',
+        analysis: {
+          financialKeywords: [],
+          potentialAmounts: [],
+          dates: [],
+          lineCount: 0,
+          summary: 'Document processing failed'
+        }
+      },
+      summary: 'Document processing failed'
     });
   }
 };
@@ -552,16 +584,38 @@ exports.handleExtract = async (req, res) => {
     const result = await runFinancialExtraction(ocrText);
     
     console.log('✅ Financial extraction completed');
-    res.json({
+    
+    // Ensure we always return a valid JSON response
+    const response = {
       json: result,
       summary: result.analysis?.summary || `Successfully analyzed ${result.wordCount} words from the provided text.`
-    });
+    };
+    
+    console.log('Sending response:', JSON.stringify(response, null, 2));
+    res.json(response);
 
   } catch (error) {
     console.error('❌ Extraction error:', error);
+    
+    // Always return a valid JSON response even on error
     res.status(500).json({ 
       error: 'Extraction failed', 
-      details: error.message 
+      details: error.message,
+      json: {
+        documentType: 'Error',
+        wordCount: 0,
+        characterCount: 0,
+        confidence: 'Error',
+        extractedText: '',
+        analysis: {
+          financialKeywords: [],
+          potentialAmounts: [],
+          dates: [],
+          lineCount: 0,
+          summary: 'Text analysis failed'
+        }
+      },
+      summary: 'Text analysis failed'
     });
   }
 }; 
