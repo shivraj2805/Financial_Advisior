@@ -31,6 +31,7 @@ import {
 import Features from "../components/Features";
 import NavBar from "../components/NavBar"; // Import NavBar
 import Footer from "../components/Footer";
+import "../LandingPage/Hero/Hero.css";
 
 const translations = {
   en: {
@@ -72,7 +73,7 @@ const translations = {
         },
         {
           title: "Expense Tracker", // Added expense tracker
-          description: "Track and manage your daily expenses with smart categorization",
+          description: "Track and manage your daily expenses with smart categorization and budget insights",
           link: "/expenses",
           icon: Receipt,
         },
@@ -242,7 +243,7 @@ const translations = {
         },
         {
           title: "व्यय ट्रैकर", // Added expense tracker in Hindi
-          description: "स्मार्ट वर्गीकरण के साथ अपने दैनिक खर्चों को ट्रैक और प्रबंधित करें",
+          description: "स्मार्ट वर्गीकरण और बजट अंतर्दृष्टि के साथ अपने दैनिक खर्चों को ट्रैक और प्रबंधित करें",
           link: "/expenses",
           icon: Receipt,
         },
@@ -489,10 +490,71 @@ const BusinessIdeasScroll = ({ ideas }) => {
   );
 };
 
+const SNAKE_LENGTH = 18;
+
 const LandingPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [language, setLanguage] = useState("en");
   const t = translations[language];
+
+  // Cursor and snake trail logic
+  const cursorRef = useRef(null);
+  const snakeTrailRef = useRef(Array(SNAKE_LENGTH).fill({ x: window.innerWidth / 2, y: window.innerHeight / 2 }));
+  const [snakeTrail, setSnakeTrail] = useState(snakeTrailRef.current);
+
+  useEffect(() => {
+    const cursor = cursorRef.current;
+    let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    let animationFrame;
+    const moveCursor = (e) => {
+      mouse = { x: e.clientX, y: e.clientY };
+      if (cursor) {
+        cursor.style.left = mouse.x + "px";
+        cursor.style.top = mouse.y + "px";
+      }
+    };
+    const animateSnake = () => {
+      setSnakeTrail((prev) => {
+        const newTrail = [...prev];
+        newTrail[0] = { ...mouse };
+        for (let i = 1; i < SNAKE_LENGTH; i++) {
+          newTrail[i] = {
+            x: newTrail[i].x + (newTrail[i - 1].x - newTrail[i].x) * 0.5,
+            y: newTrail[i].y + (newTrail[i - 1].y - newTrail[i].y) * 0.5,
+          };
+        }
+        return newTrail;
+      });
+      animationFrame = requestAnimationFrame(animateSnake);
+    };
+    animateSnake();
+    window.addEventListener("mousemove", moveCursor);
+    return () => {
+      window.removeEventListener("mousemove", moveCursor);
+      cancelAnimationFrame(animationFrame);
+    };
+  }, []);
+
+  // SVG lines for snake effect
+  const lines = [];
+  for (let i = 1; i < snakeTrail.length; i++) {
+    const p1 = snakeTrail[i - 1];
+    const p2 = snakeTrail[i];
+    lines.push(
+      <line
+        key={i}
+        x1={p1.x}
+        y1={p1.y}
+        x2={p2.x}
+        y2={p2.y}
+        stroke="url(#snake-gradient)"
+        strokeWidth={16 - i * 0.7}
+        opacity={0.10 + 0.4 * (1 - i / SNAKE_LENGTH)}
+        strokeLinecap="round"
+        className="snake-line"
+      />
+    );
+  }
 
   const toggleLanguage = () => {
     setLanguage((prev) => (prev === "en" ? "hi" : "en"));
@@ -501,12 +563,30 @@ const LandingPage = () => {
   return (
     <>
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-white">
-        <NavBar language={language} toggleLanguage={toggleLanguage} t={t.nav} />
+        <NavBar language={language} toggleLanguage={toggleLanguage} t={t.nav} />{" "}
+        {/* Use NavBar */}
         <header className="text-center pt-24">
           <h1 className="text-4xl font-bold text-green-800">{t.hero.title}</h1>
           <p className="mt-4 text-green-600">{t.hero.subtitle}</p>
         </header>
         <Features t={t.features} />
+        <section className="py-12 bg-white text-center">
+          <h2 className="text-2xl font-bold text-green-800">
+            {t.businessIdeas.title}
+          </h2>
+          <p className="mt-2 text-green-600">{t.businessIdeas.subtitle}</p>
+          <BusinessIdeasScroll ideas={t.businessIdeas.ideas} />
+        </section>
+        <section className="py-12 bg-gradient-to-br from-green-100 to-green-50">
+          <h2 className="text-2xl font-bold text-green-800 text-center">
+            {t.successStories.title}
+          </h2>
+          <p className="mt-2 text-green-600 text-center">
+            {t.successStories.subtitle}
+          </p>
+          <SuccessStoryTimeline steps={t.successStories.steps} />
+        </section>
+        <Footer />
       </div>
     </>
   );

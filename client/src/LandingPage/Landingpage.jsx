@@ -68,18 +68,18 @@ const translations = {
           link: "/advisor",
           icon: Bot,
         },
-        {
-          title: "Learning Center",
-          description: "Access courses and educational content",
-          link: "/learn",
-          icon: BookOpen,
-        },
-        {
-          title: "Roadmap",
-          description: "Explore a tailored roadmap to financial success",
-          link: "/road",
-          icon: Map,
-        },
+        // {
+        //   title: "Learning Center",
+        //   description: "Access courses and educational content",
+        //   link: "/learn",
+        //   icon: BookOpen,
+        // },
+        // {
+        //   title: "Roadmap",
+        //   description: "Explore a tailored roadmap to financial success",
+        //   link: "/road",
+        //   icon: Map,
+        // },
         {
           title: "Expense Tracker", // Added expense tracker
           description: "Track and manage your daily expenses with smart categorization",
@@ -122,12 +122,12 @@ const translations = {
           link: "/stories",
           icon: Award,
         },
-        {
-          title: "Women's Portal",
-          description: "Empowering women through financial independence and support",
-          link: "/womens",
-          icon: Users,
-        },
+        // {
+        //   title: "Women's Portal",
+        //   description: "Empowering women through financial independence and support",
+        //   link: "/womens",
+        //   icon: Users,
+        // },
         {
           title: "OCR Based Finance Doc Reading",
           description: "Scan and understand financial documents with AI-powered OCR",
