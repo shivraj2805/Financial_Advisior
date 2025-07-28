@@ -39,7 +39,8 @@ const GovernmentSchemes = () => {
     setError("");
 
     try {
-      const response = await axios.post("http://localhost:8080/api/schemes", filters);
+      const backend_url = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+      const response = await axios.post(`${backend_url}/api/schemes`, filters);
 
       if (Array.isArray(response.data)) {
         setSchemes(response.data);
