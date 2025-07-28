@@ -1,16 +1,14 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ExpenseTable from '../components/ExpenseTable';
 import ExpenseDetails from '../components/ExpenseDetails';
 import ExpenseForm from '../components/ExpenseForm';
-import AuthContext from '../Authorisation/AuthProvider'; // Import AuthContext
 
 // API Base URL - Update this according to your backend
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
 
 function ExpenseTracker() {
-    const { token, isAuthenticated } = useContext(AuthContext); // Get token and isAuthenticated from AuthContext
     const [expenses, setExpenses] = useState([]);
     const [incomeAmt, setIncomeAmt] = useState(0);
     const [expenseAmt, setExpenseAmt] = useState(0);
@@ -29,32 +27,18 @@ function ExpenseTracker() {
         setExpenseAmt(exp);
     }, [expenses]);
 
-    // Helper to get headers with authorization
-    const getAuthHeaders = () => ({
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-    });
-
     // Fetch transactions from backend
     const fetchTransactions = async () => {
-        if (!token || !isAuthenticated) {
-            setError('Authentication required. Please log in.');
-            setLoading(false);
-            return;
-        }
-
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch(`${API_BASE_URL}/transactions`, {
-                headers: getAuthHeaders(),
-            });
-
+            const response = await fetch(`${API_BASE_URL}/transactions`);
+            
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || 'Failed to fetch transactions');
             }
-
+            
             const data = await response.json();
             setExpenses(Array.isArray(data) ? data : []);
         } catch (err) {
@@ -68,35 +52,22 @@ function ExpenseTracker() {
 
     // Fetch statistics
     const fetchStats = async () => {
-        if (!token || !isAuthenticated) {
-            return; // Don't try to fetch stats if not authenticated
-        }
         try {
-            const response = await fetch(`${API_BASE_URL}/transactions/stats`, {
-                headers: getAuthHeaders(),
-            });
+            const response = await fetch(`${API_BASE_URL}/transactions/stats`);
             if (response.ok) {
                 const statsData = await response.json();
                 setStats(statsData);
-            } else {
-                console.warn('Failed to fetch stats:', response.statusText);
             }
         } catch (err) {
             console.warn('Failed to fetch stats:', err);
         }
     };
 
-    // Initial data fetch - dependency on token and isAuthenticated
+    // Initial data fetch
     useEffect(() => {
-        if (isAuthenticated) { // Only fetch if authenticated
-            fetchTransactions();
-            fetchStats();
-        } else if (isAuthenticated === false) {
-             // If isAuthenticated is explicitly false, it means token verification failed
-             setError('You are not logged in. Please log in to view transactions.');
-             setLoading(false);
-        }
-    }, [token, isAuthenticated]); // Re-run when token or auth status changes
+        fetchTransactions();
+        fetchStats();
+    }, []);
 
     // Delete transaction from backend
     const deleteExpense = async (id) => {
@@ -104,15 +75,13 @@ function ExpenseTracker() {
             toast.error('Invalid transaction ID');
             return;
         }
-        if (!token || !isAuthenticated) {
-            toast.error('Authentication required to delete transaction.');
-            return;
-        }
 
         try {
-            const response = await fetch(`${API_BASE_URL}/transactions/${id}`, {
+            const response = await fetch(`${API_BASE_URL}/transactions/${id}`, { 
                 method: 'DELETE',
-                headers: getAuthHeaders()
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             });
 
             if (!response.ok) {
@@ -121,11 +90,11 @@ function ExpenseTracker() {
             }
 
             const result = await response.json();
-
+            
             // Update local state
             setExpenses(prev => prev.filter(expense => expense._id !== id));
             toast.success(result.message || 'Transaction deleted successfully');
-
+            
             // Refresh stats
             fetchStats();
         } catch (err) {
@@ -136,18 +105,13 @@ function ExpenseTracker() {
 
     // Add transaction to backend
     const addTransaction = async (data) => {
-        if (!token || !isAuthenticated) {
-            toast.error('Authentication required to add transaction.');
-            return;
-        }
-
         try {
             const transactionData = {
                 text: data.text.trim(),
                 amount: parseFloat(data.amount)
             };
 
-            // Client-side validation (already present, but good to re-iterate)
+            // Client-side validation
             if (!transactionData.text) {
                 toast.error('Please enter a transaction description');
                 return;
@@ -160,7 +124,9 @@ function ExpenseTracker() {
 
             const response = await fetch(`${API_BASE_URL}/transactions`, {
                 method: 'POST',
-                headers: getAuthHeaders(),
+                headers: { 
+                    'Content-Type': 'application/json'
+                },
                 body: JSON.stringify(transactionData)
             });
 
@@ -170,11 +136,11 @@ function ExpenseTracker() {
             }
 
             const newTransaction = await response.json();
-
+            
             // Update local state
             setExpenses(prev => [newTransaction, ...prev]);
             toast.success('Transaction added successfully');
-
+            
             // Refresh stats
             fetchStats();
         } catch (err) {
@@ -185,9 +151,6 @@ function ExpenseTracker() {
 
     // Retry function for error state
     const handleRetry = () => {
-        // Clear error and re-attempt fetch
-        setError(null);
-        setLoading(true);
         fetchTransactions();
         fetchStats();
     };
@@ -222,7 +185,7 @@ function ExpenseTracker() {
                             <div className="text-red-600 text-xl mb-2">⚠️</div>
                             <h3 className="text-red-800 font-semibold mb-2">Something went wrong</h3>
                             <p className="text-red-600 mb-4">{error}</p>
-                            <button
+                            <button 
                                 onClick={handleRetry}
                                 className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition duration-200"
                             >
@@ -241,9 +204,9 @@ function ExpenseTracker() {
                                 expenseAmt={expenseAmt}
                                 stats={stats}
                             />
-
+                            
                             <ExpenseForm
-                                addTransaction={addTransaction}
+                                addTransaction={addTransaction} 
                             />
                         </div>
 
@@ -265,22 +228,22 @@ function ExpenseTracker() {
                         {error ? 'Offline' : 'Connected'}
                     </div>
                 </div>
-
-                {/* Toast Container with custom styling */}
-                <ToastContainer
-                    position="top-right"
-                    autoClose={3000}
-                    hideProgressBar={false}
-                    newestOnTop={false}
-                    closeOnClick
-                    rtl={false}
-                    pauseOnFocusLoss
-                    draggable
-                    pauseOnHover
-                    theme="light"
-                    toastClassName="rounded-lg"
-                />
             </div>
+            
+            {/* Toast Container with custom styling */}
+            <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+                toastClassName="rounded-lg"
+            />
         </div>
     );
 }
