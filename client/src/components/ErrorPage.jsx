@@ -1,24 +1,262 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
+const SNAKE_LENGTH = 20;
+
 const ErrorPage = () => {
-  return (
-    <div className="text-center mt-12 font-sans flex justify-center flex-col items-center">
-      <img
-        src="https://media.geeksforgeeks.org/wp-content/uploads/20230802153215/Error-404.png"
-        alt="Error"
-        className="w-96 mb-5 mx-auto"
+  // --- Snake Trail State ---
+  const cursorRef = useRef(null);
+  const [snakeTrail, setSnakeTrail] = useState(
+    Array(SNAKE_LENGTH).fill({ x: window.innerWidth / 2, y: window.innerHeight / 2 })
+  );
+
+  useEffect(() => {
+    const cursor = cursorRef.current;
+    let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    let animationFrame;
+
+    const moveCursor = (e) => {
+      mouse = { x: e.clientX, y: e.clientY };
+      if (cursor) {
+        cursor.style.left = mouse.x + "px";
+        cursor.style.top = mouse.y + "px";
+      }
+    };
+
+    // Snake trail animation
+    const animateSnake = () => {
+      setSnakeTrail((prev) => {
+        const newTrail = [...prev];
+        newTrail[0] = { ...mouse };
+        for (let i = 1; i < SNAKE_LENGTH; i++) {
+          newTrail[i] = {
+            x: newTrail[i].x + (newTrail[i - 1].x - newTrail[i].x) * 0.5,
+            y: newTrail[i].y + (newTrail[i - 1].y - newTrail[i].y) * 0.5,
+          };
+        }
+        return newTrail;
+      });
+      animationFrame = requestAnimationFrame(animateSnake);
+    };
+    animateSnake();
+
+    window.addEventListener("mousemove", moveCursor);
+    document.body.style.cursor = "none";
+
+    return () => {
+      window.removeEventListener("mousemove", moveCursor);
+      document.body.style.cursor = "";
+      cancelAnimationFrame(animationFrame);
+    };
+  }, []);
+
+  // --- SVG lines for snake effect ---
+  const lines = [];
+  for (let i = 1; i < snakeTrail.length; i++) {
+    const p1 = snakeTrail[i - 1];
+    const p2 = snakeTrail[i];
+    lines.push(
+      <line
+        key={i}
+        x1={p1.x}
+        y1={p1.y}
+        x2={p2.x}
+        y2={p2.y}
+        stroke="url(#snake-gradient)"
+        strokeWidth={18 - i * 0.7}
+        opacity={0.13 + 0.5 * (1 - i / SNAKE_LENGTH)}
+        strokeLinecap="round"
+        className="snake-line"
       />
-      <h1 className="text-4xl text-gray-800 font-bold">404 - Page Not Found</h1>
-      <p className="text-lg text-gray-600">
-        Sorry, the page you are looking for does not exist.
-      </p>
-      <Link
-        to="/"
-        className=" mt-2 text-lg text-white bg-green-500 px-4 py-2 rounded no-underline"
-      >
-        Go to Home
-      </Link>
+    );
+  }
+
+  // --- Pop-up Visualisation Elements ---
+  const popups = [
+    // Green orb
+    <div key="orb" className="popup-visual popup-orb animate-pop-orb" />,
+    // Sparkle
+    <div key="sparkle" className="popup-visual popup-sparkle animate-pop-sparkle" />,
+    // Geometric triangle
+    <svg key="triangle" className="popup-visual popup-triangle animate-pop-triangle" width="32" height="32" viewBox="0 0 32 32">
+      <polygon points="16,4 28,28 4,28" fill="#bbf7d0" stroke="#22c55e" strokeWidth="2" />
+    </svg>
+  ];
+
+  return (
+    <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-green-50 via-green-100 to-green-200 font-sans relative overflow-hidden select-none">
+      {/* Custom Cursor */}
+      <div ref={cursorRef} className="custom-cursor"></div>
+      {/* Snake Trail Lines (SVG) */}
+      <svg className="snake-svg-lines" width={window.innerWidth} height={window.innerHeight}>
+        <defs>
+          <linearGradient id="snake-gradient" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#fff" stopOpacity="0.8" />
+            <stop offset="60%" stopColor="#bbf7d0" stopOpacity="0.7" />
+            <stop offset="100%" stopColor="#22c55e" stopOpacity="0.5" />
+          </linearGradient>
+        </defs>
+        {lines}
+      </svg>
+      {/* Snake Trail Dots */}
+      {snakeTrail.map((pos, idx) => (
+        <div
+          key={idx}
+          className="snake-dot"
+          style={{
+            left: pos.x + "px",
+            top: pos.y + "px",
+            opacity: 0.45 * (1 - idx / SNAKE_LENGTH),
+            zIndex: 9995,
+            width: 38 - idx + "px",
+            height: 38 - idx + "px",
+            background: `radial-gradient(circle at 40% 40%, #fff 70%, #bbf7d0 90%, #22c55e 100%)`,
+            filter: `blur(${3 + idx * 1.1}px)`
+          }}
+        />
+      ))}
+      <div className="flex flex-col items-center p-10 rounded-3xl shadow-2xl bg-white animate-pop-card z-10 max-w-lg w-full border-4 border-green-200 relative overflow-visible">
+        {/* Pop-up Visualisation Elements */}
+        {popups}
+        {/* Clock Icon */}
+        <div className="absolute -top-16 left-1/2 -translate-x-1/2 bg-white rounded-full shadow-lg border-4 border-green-300 p-4 animate-pop-in">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+            <circle cx="32" cy="32" r="30" fill="#f0fdf4" stroke="#22c55e" strokeWidth="4" />
+            <circle cx="32" cy="32" r="6" fill="#22c55e" />
+            <rect x="30.5" y="18" width="3" height="16" rx="1.5" fill="#22c55e" />
+            <rect x="32" y="32" width="12" height="3" rx="1.5" fill="#22c55e" transform="rotate(45 32 32)" />
+          </svg>
+        </div>
+        <h1 className="text-5xl text-green-600 font-extrabold mb-2 tracking-tight drop-shadow-sm mt-10">
+          404
+        </h1>
+        <h2 className="text-2xl text-gray-800 font-bold mb-2">Page Not Found</h2>
+        <p className="text-lg text-gray-600 mb-6 max-w-md text-center">
+          Oops! The page you are looking for doesn't exist or has been moved.<br />
+          Let's get you back to safety.
+        </p>
+        <Link
+          to="/"
+          className="text-lg font-semibold text-white bg-gradient-to-r from-green-400 to-green-600 px-6 py-3 rounded-full shadow-lg hover:scale-105 hover:from-green-500 hover:to-green-700 transition-all duration-200 no-underline flex items-center gap-2 justify-center"
+        >
+          <span role="img" aria-label="home">🏠</span> Go Home
+        </Link>
+      </div>
+      <style>{`
+        .custom-cursor {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 28px;
+          height: 28px;
+          border-radius: 50%;
+          background: rgba(34,197,94,0.18);
+          border: 2px solid #22c55e;
+          pointer-events: none;
+          z-index: 9999;
+          transform: translate(-50%, -50%);
+          transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+          mix-blend-mode: multiply;
+          box-shadow: 0 0 12px 2px #22c55e33;
+        }
+        .snake-svg-lines {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw !important;
+          height: 100vh !important;
+          pointer-events: none;
+          z-index: 9994;
+        }
+        .snake-line {
+          filter: blur(4px);
+          transition: stroke 0.2s, opacity 0.2s;
+        }
+        .snake-dot {
+          position: fixed;
+          border-radius: 50%;
+          pointer-events: none;
+          transition: left 0.06s linear, top 0.06s linear, opacity 0.2s, width 0.2s, height 0.2s, filter 0.2s;
+          box-shadow: 0 0 48px 16px #bbf7d088, 0 0 16px 4px #fff8;
+          mix-blend-mode: lighten;
+          will-change: left, top, opacity, width, height, filter;
+        }
+        .popup-visual {
+          position: absolute;
+          z-index: 20;
+          opacity: 0.85;
+        }
+        .popup-orb {
+          top: -32px;
+          left: 24px;
+          width: 38px;
+          height: 38px;
+          background: radial-gradient(circle at 40% 40%, #bbf7d0 70%, #22c55e 100%);
+          border-radius: 50%;
+          box-shadow: 0 0 32px 8px #bbf7d088;
+          animation: float-orb 4.5s ease-in-out infinite alternate;
+        }
+        .popup-sparkle {
+          top: 12px;
+          right: 24px;
+          width: 22px;
+          height: 22px;
+          background: none;
+          border-radius: 50%;
+          box-shadow: 0 0 0 0 #fff0, 0 0 16px 4px #bbf7d0;
+        }
+        .popup-sparkle::before {
+          content: '';
+          display: block;
+          width: 100%;
+          height: 100%;
+          background: conic-gradient(from 0deg, #bbf7d0 0 25%, #fff 25% 50%, #bbf7d0 50% 75%, #fff 75% 100%);
+          border-radius: 50%;
+          opacity: 0.7;
+          filter: blur(1.5px);
+        }
+        .popup-triangle {
+          bottom: -24px;
+          left: 50%;
+          transform: translateX(-50%) scale(1.1) rotate(-8deg);
+          filter: drop-shadow(0 0 8px #bbf7d0);
+          animation: float-triangle 5.2s ease-in-out infinite alternate;
+        }
+        @keyframes float-orb {
+          0% { transform: translateY(0) scale(1); }
+          100% { transform: translateY(-18px) scale(1.08); }
+        }
+        @keyframes float-triangle {
+          0% { transform: translateX(-50%) scale(1.1) rotate(-8deg); }
+          100% { transform: translateX(-50%) scale(1.18) rotate(8deg); }
+        }
+        @keyframes fade-in {
+          from { opacity: 0; transform: scale(0.95); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.8s ease;
+        }
+        @keyframes pop-in {
+          0% { opacity: 0; transform: scale(0.7) translateY(-30px);}
+          100% { opacity: 1; transform: scale(1) translateY(0);}
+        }
+        .animate-pop-in {
+          animation: pop-in 0.7s cubic-bezier(.4,2,.6,1) both;
+        }
+        .animate-pop-orb {
+          animation: pop-in 0.7s cubic-bezier(.4,2,.6,1) both, float-orb 4.5s ease-in-out 0.7s infinite alternate;
+        }
+        .animate-pop-sparkle {
+          animation: pop-in 0.7s cubic-bezier(.4,2,.6,1) both;
+        }
+        .animate-pop-triangle {
+          animation: pop-in 0.7s cubic-bezier(.4,2,.6,1) both, float-triangle 5.2s ease-in-out 0.7s infinite alternate;
+        }
+        .animate-pop-card {
+          animation: pop-in 0.7s cubic-bezier(.4,2,.6,1) both;
+        }
+      `}</style>
     </div>
   );
 };
