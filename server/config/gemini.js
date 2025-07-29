@@ -16,7 +16,7 @@ async function gemini(prompt) {
     const response = await axios.post(GEMINI_URL, {
       contents: [{ parts: [{ text: prompt }] }],
     }, {
-      timeout: 30000, // 30 second timeout
+      timeout: 60000, // 60 second timeout (increased from 30s)
       headers: {
         'Content-Type': 'application/json',
       }
