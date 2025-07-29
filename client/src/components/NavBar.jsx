@@ -92,13 +92,13 @@ const NavBar = ({ language, toggleLanguage }) => {
               </a>
             </SignedOut>
 
-            <button
+            {/* <button
               onClick={toggleLanguage}
               className="flex items-center px-3 py-1 rounded-full bg-green-100 text-green-800 hover:bg-green-200 transition font-semibold shadow-sm border border-green-200"
             >
               <Globe className="h-4 w-4 mr-1" />
-              {/* {language.toUpperCase()} */}
-            </button>
+             
+            </button> */}
 
             {/* Show User Profile Button if signed in */}
             <SignedIn>
@@ -167,13 +167,13 @@ const NavBar = ({ language, toggleLanguage }) => {
               </a>
             </SignedOut>
 
-            <button
+            {/* <button
               onClick={toggleLanguage}
               className="flex items-center px-3 py-2 rounded-full bg-green-100 text-green-800 hover:bg-green-200 transition font-semibold shadow-sm border border-green-200 w-full"
             >
               <Globe className="h-4 w-4 mr-1" />
               {language.toUpperCase()}
-            </button>
+            </button> */}
 
              {/* Show User Profile Button if signed in */}
              <SignedIn>
