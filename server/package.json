@@ -35,6 +35,6 @@
     "puppeteer": "^24.11.2",
     "socket.io": "^4.8.1",
     "tesseract.js": "^6.0.1",
-     "dayjs": "^1.11.13",
+    "dayjs": "^1.11.13"
   }
 }

@@ -4,7 +4,7 @@ import AuthContext from '../Authorisation/AuthProvider';
 import { useUser } from '@clerk/clerk-react';
 import dayjs from 'dayjs';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080"; // Fixed port to match server
+const API_URL = process.env.REACT_APP_BACKEND_URL || "https://your-production-backend.com";
 
 const MEETING_TYPES = [
   { value: 'qna', label: 'Q&A', icon: <FaQuestionCircle />, color: 'green' },
@@ -57,8 +57,8 @@ const QASessions = () => {
   const [registrationSuccess, setRegistrationSuccess] = useState('');
   const { user, isSignedIn, isLoaded } = useUser();
 
-  // Add isAdmin flag for demo
-  const isAdmin = true;
+  // Remove hardcoded admin flag - use proper authentication
+  const isAdmin = user?.publicMetadata?.role === 'admin' || false;
 
   // Add edit modal state
   const [showEditModal, setShowEditModal] = useState(false);
@@ -114,18 +114,13 @@ const QASessions = () => {
         }
       });
       
-      console.log('User registrations response status:', res.status);
-
       if (res.ok) {
         const registrations = await res.json();
         const registeredIds = registrations.map(reg => reg.sessionId);
         setRegisteredSessions(new Set(registeredIds));
-        console.log('User registrations:', registeredIds);
-      } else {
-        console.log('No user registrations found or endpoint not available');
       }
     } catch (err) {
-      console.error('Failed to fetch user registrations:', err);
+      // Silent fail - user registrations are optional
     }
   };
 
@@ -158,9 +153,6 @@ const QASessions = () => {
         createdAt: new Date().toISOString()
       };
 
-      console.log('Creating meeting:', payload);
-      console.log('API URL:', API_URL);
-
       const res = await fetch(`${API_URL}/api/meetings`, {
         method: 'POST',
         headers: { 
@@ -170,31 +162,25 @@ const QASessions = () => {
         body: JSON.stringify(payload),
       });
 
-      console.log('Response status:', res.status);
-      console.log('Response headers:', res.headers);
-
       if (!res.ok) {
         const errorText = await res.text();
-        console.error('Error response:', errorText);
         let errorMessage = 'Failed to create meeting';
         try {
           const errorData = JSON.parse(errorText);
           errorMessage = errorData.message || errorMessage;
         } catch (e) {
-          console.error('Failed to parse error response:', e);
           if (res.status === 404) {
             errorMessage = 'API endpoint not found. Please check the backend routes.';
           } else if (res.status === 500) {
             errorMessage = 'Server error. Please try again later.';
           } else if (res.status === 0) {
-            errorMessage = 'Cannot connect to server. Please check if the backend is running on port 8080.';
+            errorMessage = 'Cannot connect to server. Please check if the backend is running.';
           }
         }
         throw new Error(errorMessage);
       }
 
       const result = await res.json();
-      console.log('Meeting created:', result);
 
       setFormSuccess('Meeting created successfully!');
       setShowCreateModal(false);
@@ -248,8 +234,6 @@ const QASessions = () => {
         userId: user?.id || registrationForm.email
       };
 
-      console.log('Submitting registration:', payload);
-
       const res = await fetch(`${API_URL}/api/meetings/${selectedSession._id}/register`, {
         method: 'POST',
         headers: { 
@@ -259,17 +243,13 @@ const QASessions = () => {
         body: JSON.stringify(payload),
       });
 
-      console.log('Registration response status:', res.status);
-
       if (!res.ok) {
         const errorText = await res.text();
-        console.error('Registration error response:', errorText);
         let errorMessage = 'Failed to register';
         try {
           const errorData = JSON.parse(errorText);
           errorMessage = errorData.error || errorData.message || errorMessage;
         } catch (e) {
-          console.error('Failed to parse registration error:', e);
           if (res.status === 400) {
             errorMessage = 'Invalid registration data. Please check your information.';
           } else if (res.status === 404) {
@@ -282,7 +262,6 @@ const QASessions = () => {
       }
 
       const result = await res.json();
-      console.log('Registration successful:', result);
 
       setRegistrationSuccess('Registration successful! You can now join the meeting.');
       
@@ -318,19 +297,14 @@ const QASessions = () => {
         }
       });
       
-      console.log('Attendees response status:', res.status);
-
       if (!res.ok) {
         const errorText = await res.text();
-        console.error('Attendees error response:', errorText);
         throw new Error('Failed to fetch attendees');
       }
       
       const attendees = await res.json();
-      console.log('Attendees:', attendees);
       setSessionAttendees(attendees || []);
     } catch (err) {
-      console.error('Fetch attendees error:', err);
       setSessionAttendees([]);
     }
   };
@@ -365,8 +339,6 @@ const QASessions = () => {
         updatedAt: new Date().toISOString()
       };
 
-      console.log('Updating meeting:', payload);
-
       const res = await fetch(`${API_URL}/api/meetings/${editingId}`, {
         method: 'PUT',
         headers: { 
@@ -376,23 +348,19 @@ const QASessions = () => {
         body: JSON.stringify(payload),
       });
 
-      console.log('Edit response status:', res.status);
-
       if (!res.ok) {
         const errorText = await res.text();
-        console.error('Edit error response:', errorText);
         let errorMessage = 'Failed to update meeting';
         try {
           const errorData = JSON.parse(errorText);
           errorMessage = errorData.message || errorMessage;
         } catch (e) {
-          console.error('Failed to parse edit error:', e);
+          // Silent fail for parsing errors
         }
         throw new Error(errorMessage);
       }
 
       const result = await res.json();
-      console.log('Meeting updated:', result);
 
       setShowEditModal(false);
       setEditingId(null);
@@ -411,8 +379,7 @@ const QASessions = () => {
         })
         .finally(() => setLoading(false));
     } catch (err) {
-      console.error('Edit meeting error:', err);
-      alert(err.message || 'Failed to update meeting');
+      setActionError(err.message || 'Failed to update meeting');
     } finally {
       setEditing(false);
     }
@@ -430,22 +397,17 @@ const QASessions = () => {
         }
       });
       
-      console.log('Delete response status:', res.status);
-
       if (!res.ok) {
         const errorText = await res.text();
-        console.error('Delete error response:', errorText);
         let errorMessage = 'Failed to delete meeting';
         try {
           const errorData = JSON.parse(errorText);
           errorMessage = errorData.message || errorMessage;
         } catch (e) {
-          console.error('Failed to parse delete error:', e);
+          // Silent fail for parsing errors
         }
         throw new Error(errorMessage);
       }
-
-      console.log('Meeting deleted successfully');
       
       // Refresh sessions
       Promise.all([
@@ -460,8 +422,7 @@ const QASessions = () => {
         })
         .finally(() => setLoading(false));
     } catch (err) {
-      console.error('Delete meeting error:', err);
-      alert(err.message || 'Failed to delete meeting');
+      setActionError(err.message || 'Failed to delete meeting');
     }
   };
 
@@ -514,17 +475,14 @@ const QASessions = () => {
         }
       });
       
-      console.log('Go live response status:', res.status);
-
       if (!res.ok) {
         const errorText = await res.text();
-        console.error('Go live error response:', errorText);
         let errorMessage = 'Failed to go live';
         try {
           const errorData = JSON.parse(errorText);
           errorMessage = errorData.message || errorMessage;
         } catch (e) {
-          console.error('Failed to parse go live error:', e);
+          // Silent fail for parsing errors
         }
         throw new Error(errorMessage);
       }
@@ -604,22 +562,7 @@ const QASessions = () => {
     window.open(session.joinUrl, '_blank', 'noopener');
   };
 
-  // Debug function to check live meeting status
-  const checkLiveMeetingStatus = async () => {
-    try {
-      const res = await fetch(`${API_URL}/api/meetings/live`);
-      const liveMeeting = await res.json();
-      console.log('Current live meeting:', liveMeeting);
-      if (liveMeeting && liveMeeting._id) {
-        setActionSuccess(`Live meeting: ${liveMeeting.title}`);
-      } else {
-        setActionError('No live meeting found');
-      }
-    } catch (err) {
-      console.error('Error checking live meeting:', err);
-      setActionError('Failed to check live meeting status');
-    }
-  };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
@@ -638,13 +581,7 @@ const QASessions = () => {
         </div>
 
         {/* Enhanced Create Meeting Button */}
-        <div className="flex justify-end mb-8 gap-4">
-          <button
-            onClick={checkLiveMeetingStatus}
-            className="bg-purple-500 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-purple-600 transition-colors duration-300"
-          >
-            Check Live Status
-          </button>
+        <div className="flex justify-end mb-8">
           <button
             className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center gap-2"
             onClick={() => setShowCreateModal(true)}
