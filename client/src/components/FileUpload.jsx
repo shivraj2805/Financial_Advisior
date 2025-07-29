@@ -29,10 +29,14 @@ const FileUpload = ({ onOcrText, onFileChange, onError }) => {
     const formData = new FormData();
     formData.append('file', file);
 
+    const API_BASE = process.env.NODE_ENV === 'production'
+      ? 'https://<YOUR-RENDER-BACKEND-URL>'
+      : '';
+
     try {
       console.log('Uploading file:', file.name, 'Size:', file.size, 'Type:', file.type);
       
-      const response = await fetch('/api/ocr/upload-financial-doc', {
+      const response = await fetch(`${API_BASE}/api/ocr/upload-financial-doc`, {
         method: 'POST',
         body: formData,
       });
