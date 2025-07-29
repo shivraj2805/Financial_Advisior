@@ -13,6 +13,7 @@ const communityRoutes = require('./routes/community');
 const successStoriesRoutes = require("./routes/successStories")
 const schemesRoutes = require("./routes/schemeRoutes");
 const ocrRoutes = require("./routes/ocr");
+const transactionsRouter = require('./routes/transactions');
 
 const app = express();
 const http = require('http').createServer(app);
@@ -67,6 +68,7 @@ app.use('/api/communities', communityRoutes);
 app.use("/api/success-stories",successStoriesRoutes );
 app.use("/api/schemes", schemesRoutes);
 app.use("/api/ocr", ocrRoutes);
+app.use('/api/transactions', transactionsRouter);
 
 app.get("/ping", (req, res) => {
   res.send("Hello Server");
