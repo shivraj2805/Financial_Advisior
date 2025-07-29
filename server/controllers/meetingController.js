@@ -55,9 +55,6 @@ exports.getLiveMeeting = async (req, res) => {
     const today = new Date().toISOString().split('T')[0];
     const now = dayjs();
     
-    console.log('Checking for live meetings on:', today);
-    console.log('Current time:', now.format('YYYY-MM-DD HH:mm'));
-    
     // Find meetings for today, not archived, correct type
     const meetings = await Meeting.find({
       date: today,
@@ -66,29 +63,18 @@ exports.getLiveMeeting = async (req, res) => {
       type: { $in: ['qna', 'webinar'] }
     }).sort({ time: 1 });
     
-    console.log('Found meetings for today:', meetings.length);
-    
     for (const meeting of meetings) {
       const meetingStart = dayjs(`${meeting.date}T${meeting.time}`);
       const meetingEnd = meetingStart.add(2, 'hour'); // Assume 2 hour duration if not specified
       
-      console.log(`Meeting: ${meeting.title}`);
-      console.log(`Start: ${meetingStart.format('YYYY-MM-DD HH:mm')}`);
-      console.log(`End: ${meetingEnd.format('YYYY-MM-DD HH:mm')}`);
-      console.log(`Is now after start: ${now.isAfter(meetingStart)}`);
-      console.log(`Is now before end: ${now.isBefore(meetingEnd)}`);
-      
       // Check if meeting is currently happening (started and not ended)
       if (now.isAfter(meetingStart) && now.isBefore(meetingEnd)) {
-        console.log('Found live meeting:', meeting.title);
         return res.json(meeting);
       }
     }
     
-    console.log('No live meetings found');
     res.json({});
   } catch (err) {
-    console.error('Error in getLiveMeeting:', err);
     res.status(500).json({ error: err.message });
   }
 };
