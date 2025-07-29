@@ -22,7 +22,7 @@ import {
   Compass,
   Newspaper as News,
   Calculator as Calc,
-  BadgeSwissFranc, FileText, Bot
+  BadgeSwissFranc, FileText, Bot ,Receipt
 } from "lucide-react";
 
 import Features from "../components/Features";
@@ -195,6 +195,12 @@ const translations = {
           description: "Scan and understand financial documents with AI-powered OCR",
           link: "/ocr",
           icon: FileText,
+        },
+        {
+          title: "Expense Tracker", // Added expense tracker
+          description: "Track and manage your daily expenses with smart categorization and budget insights",
+          link: "/expenses",
+          icon: Receipt,
         },
       ]
       

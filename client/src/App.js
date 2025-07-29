@@ -32,6 +32,7 @@ import ProtectedRoute from "./components/protected-route";
 import FinancialAdvisorChatbotUi from "./Pages/financialAdvisiorChatBotUi";
 import LandingPage from "./LandingPage/Landingpage";  
 
+import ExpenseTracker from "./Pages/ExpenseTracker"; // Adjust the path based on your file structure
 
 function App() {
   return (
@@ -71,6 +72,7 @@ function App() {
         <Route path="/advisor" element={<ProtectedRoute><FinancialAdvisorChatbotUi /></ProtectedRoute>} />
         <Route path="/ocr" element={<ProtectedRoute><DocOCR /></ProtectedRoute>} />
 
+         <Route path="/expenses" element={<ProtectedRoute><ExpenseTracker /></ProtectedRoute>} />
 
         <Route path="*" element={<ErrorPage />} />
       </Routes>

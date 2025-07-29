@@ -34,7 +34,8 @@ import {
   Compass,
   Newspaper as News,
   Calculator as Calc,
-  BadgeSwissFranc, FileText, Bot
+  BadgeSwissFranc, FileText, Bot , 
+  Receipt // Added Receipt icon for expense tracker
 } from "lucide-react";
 
 import Features from "../components/Features";
@@ -83,6 +84,7 @@ const translations = {
       //     link: "/road",
       //     icon: Map,
       //   },
+      
       //   {
       //     title: "Daily Tech News",
       //     description: "Stay updated with the latest tech news",
@@ -204,6 +206,12 @@ const translations = {
           description: "Scan and understand financial documents with AI-powered OCR",
           link: "/ocr",
           icon: FileText,
+        },
+        {
+          title: "Expense Tracker", // Added expense tracker
+          description: "Track and manage your daily expenses with smart categorization",
+          link: "/expenses",
+          icon: Receipt,
         },
       ]
       
