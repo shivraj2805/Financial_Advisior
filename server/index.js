@@ -2,7 +2,6 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const path = require("path");
-const bodyParser = require("body-parser");
 dotenv.config();
 require('./models/db');
 
@@ -10,7 +9,8 @@ const financialAdviceRoutes = require("./routes/financialAdvice");
 const businessTypesRoutes = require("./routes/businessTypes");
 const addRoutes = require("./routes/add");
 const communityRoutes = require('./routes/community');
-const successStoriesRoutes = require("./routes/successStories");
+const successStoriesRoutes = require("./routes/successStories")
+const transactionsRouter = require('./routes/transactions');
 
 const app = express();
 const http = require('http').createServer(app);
@@ -20,9 +20,9 @@ const PORT = process.env.PORT || 8080;
 // Updated CORS configuration to handle local development
 const allowedOrigins = [
   "http://localhost:3000",
-  "http://localhost:3001",
-  "http://localhost:8080",
-  "http://127.0.0.1:3000",
+  "http://localhost:3001", // Added for React dev server
+  "http://localhost:8080", // Backend server
+  "http://127.0.0.1:3000", // Alternative localhost
   "https://finadvisior.vercel.app",
   "https://finadvisorapp.vercel.app"
 ];
@@ -30,21 +30,34 @@ const allowedOrigins = [
 app.use(cors({
   origin: function (origin, callback) {
     console.log("Request Origin:", origin);
+    
+    // Allow requests with no origin (like mobile apps, Postman, etc.)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    if (origin && origin.match(/^http:\/\/localhost:\d+$/)) return callback(null, true);
+    
+    // Check if origin is in allowed list
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    
+    // Allow localhost with any port for development
+    if (origin && origin.match(/^http:\/\/localhost:\d+$/)) {
+      return callback(null, true);
+    }
+    
+    // Allow vercel app domains
     if (
       /^https:\/\/.*\.finadvisior\.vercel\.app$/.test(origin) ||
       /^https:\/\/.*\.finadvisorapp\.vercel\.app$/.test(origin)
-    ) return callback(null, true);
+    ) {
+      return callback(null, true);
+    }
+    
     return callback(new Error("Not allowed by CORS"));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
-
-app.use(bodyParser.json());
 
 // Handle preflight requests
 app.options('*', cors());
@@ -58,6 +71,7 @@ app.use("/api/business-types", businessTypesRoutes);
 app.use("/api/add", addRoutes);
 app.use('/api/communities', communityRoutes);
 app.use("/api/success-stories", successStoriesRoutes);
+app.use('/api/transactions', transactionsRouter);
 
 app.get("/ping", (req, res) => {
   res.json({ message: "Hello Server", timestamp: new Date().toISOString() });
@@ -78,7 +92,7 @@ const io = new Server(http, {
 
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
-
+  
   socket.on('joinCommunity', (communityId) => {
     socket.join(communityId);
     console.log(`User ${socket.id} joined community ${communityId}`);

@@ -35,12 +35,12 @@ export const AuthProvider = ({ children }) => {
       const token = localStorage.getItem("token");
       if (token) {
         try {
-          // Use the same API_BASE_URL as your ExpenseTracker for consistency
-          const API_BASE_URL =
-            process.env.REACT_APP_API_URL || "http://localhost:8080/api";
-          const response = await axios.get(`${API_BASE_URL}/auth/verify`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          const response = await axios.get(
+            `process.env.BACKEND_URL/api/auth/verify`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
           if (response.data.user) {
             setUser(response.data.user);
             setIsAuthenticated(true);
@@ -49,20 +49,17 @@ export const AuthProvider = ({ children }) => {
           }
         } catch (error) {
           console.error("Token verification failed:", error);
-          // Only call logout if the error is due to an invalid/expired token (403 or 401)
-          if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-            logout();
-          }
+          logout();
         }
       } else {
         logout();
       }
     };
     verifyToken();
-  }, []); // Empty dependency array means this runs once on mount
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout, token }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
