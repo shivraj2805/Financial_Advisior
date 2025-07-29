@@ -33,14 +33,20 @@ function ExpenseTracker() {
         setError(null);
         try {
             const response = await fetch(`${API_BASE_URL}/api/transactions`);
-            
+            const contentType = response.headers.get('content-type');
             if (!response.ok) {
-                const errorData = await response.json();
+                let errorData = {};
+                if (contentType && contentType.includes('application/json')) {
+                    errorData = await response.json();
+                }
                 throw new Error(errorData.message || 'Failed to fetch transactions');
             }
-            
-            const data = await response.json();
-            setExpenses(Array.isArray(data) ? data : []);
+            if (contentType && contentType.includes('application/json')) {
+                const data = await response.json();
+                setExpenses(Array.isArray(data) ? data : []);
+            } else {
+                throw new Error('Server returned non-JSON response');
+            }
         } catch (err) {
             console.error('Fetch error:', err);
             setError(err.message || 'Could not load transactions');
@@ -53,10 +59,13 @@ function ExpenseTracker() {
     // Fetch statistics
     const fetchStats = async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/transactions/stats`);
-            if (response.ok) {
+            const response = await fetch(`${API_BASE_URL}/api/transactions/stats`);
+            const contentType = response.headers.get('content-type');
+            if (response.ok && contentType && contentType.includes('application/json')) {
                 const statsData = await response.json();
                 setStats(statsData);
+            } else {
+                throw new Error('Server returned non-JSON response for stats');
             }
         } catch (err) {
             console.warn('Failed to fetch stats:', err);
@@ -77,24 +86,27 @@ function ExpenseTracker() {
         }
 
         try {
-            const response = await fetch(`${API_BASE_URL}/transactions/${id}`, { 
+            const response = await fetch(`${API_BASE_URL}/api/transactions/${id}`, { 
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json'
                 }
             });
-
+            const contentType = response.headers.get('content-type');
             if (!response.ok) {
-                const errorData = await response.json();
+                let errorData = {};
+                if (contentType && contentType.includes('application/json')) {
+                    errorData = await response.json();
+                }
                 throw new Error(errorData.message || 'Failed to delete transaction');
             }
-
-            const result = await response.json();
-            
+            let result = {};
+            if (contentType && contentType.includes('application/json')) {
+                result = await response.json();
+            }
             // Update local state
             setExpenses(prev => prev.filter(expense => expense._id !== id));
-            toast.success(result.message || 'Transaction deleted successfully');
-            
+            toast.success((result && result.message) || 'Transaction deleted successfully');
             // Refresh stats
             fetchStats();
         } catch (err) {
@@ -122,25 +134,28 @@ function ExpenseTracker() {
                 return;
             }
 
-            const response = await fetch(`${API_BASE_URL}/transactions`, {
+            const response = await fetch(`${API_BASE_URL}/api/transactions`, {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(transactionData)
             });
-
+            const contentType = response.headers.get('content-type');
             if (!response.ok) {
-                const errorData = await response.json();
+                let errorData = {};
+                if (contentType && contentType.includes('application/json')) {
+                    errorData = await response.json();
+                }
                 throw new Error(errorData.message || 'Failed to add transaction');
             }
-
-            const newTransaction = await response.json();
-            
+            let newTransaction = {};
+            if (contentType && contentType.includes('application/json')) {
+                newTransaction = await response.json();
+            }
             // Update local state
             setExpenses(prev => [newTransaction, ...prev]);
             toast.success('Transaction added successfully');
-            
             // Refresh stats
             fetchStats();
         } catch (err) {
