@@ -126,10 +126,6 @@ npm list tesseract.js pdf-parse
    - PDF for documents
    - Max size: 10MB
 
-4. **Contact support:**
-   - Share the file type and size
-   - Describe what the document contains
-   - Mention any error messages
 
 ### 🎉 **Success Checklist**
 
