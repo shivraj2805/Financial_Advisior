@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
-function ExpenseForm({ addTransaction }) {
-    const [expenseInfo, setExpenseInfo] = useState({
+function ExpenseForm({ addTransaction, transactionType = 'expense' }) {
+    const [transactionInfo, setTransactionInfo] = useState({
         amount: '',
         text: ''
     });
@@ -9,16 +9,16 @@ function ExpenseForm({ addTransaction }) {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setExpenseInfo(prev => ({
+        setTransactionInfo(prev => ({
             ...prev,
             [name]: value
         }));
     }
 
-    const addExpense = async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         
-        const { amount, text } = expenseInfo;
+        const { amount, text } = transactionInfo;
         
         // Client-side validation
         if (!text.trim()) {
@@ -34,9 +34,9 @@ function ExpenseForm({ addTransaction }) {
         setIsSubmitting(true);
         
         try {
-            await addTransaction(expenseInfo);
+            await addTransaction(transactionInfo);
             // Clear form only on successful submission
-            setExpenseInfo({ amount: '', text: '' });
+            setTransactionInfo({ amount: '', text: '' });
         } catch (error) {
             console.error('Form submission error:', error);
         } finally {
@@ -44,31 +44,46 @@ function ExpenseForm({ addTransaction }) {
         }
     }
 
+    const isIncome = transactionType === 'income';
+
     return (
-        <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-                Add New Transaction
-            </h2>
+        <div className="space-y-6">
+            <div className="text-center mb-6">
+                <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full mb-3 ${
+                    isIncome 
+                        ? 'bg-gradient-to-r from-green-500 to-emerald-600' 
+                        : 'bg-gradient-to-r from-green-600 to-teal-600'
+                }`}>
+                    <span className="text-white text-xl">
+                        {isIncome ? '💰' : '💸'}
+                    </span>
+                </div>
+                <h3 className={`text-lg font-semibold ${
+                    isIncome ? 'text-green-700' : 'text-green-700'
+                }`}>
+                    {isIncome ? 'Add Income' : 'Add Expense'}
+                </h3>
+            </div>
             
-            <form onSubmit={addExpense} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                     <label htmlFor='text' className="block text-sm font-medium text-gray-700 mb-2">
-                        Transaction Description *
+                        Description *
                     </label>
                     <input 
                         onChange={handleChange}
                         type='text' 
                         name='text' 
                         id='text'
-                        placeholder='Enter description (e.g., Salary, Groceries, Rent)' 
-                        value={expenseInfo.text}
+                        placeholder={isIncome ? 'e.g., Salary, Freelance, Bonus' : 'e.g., Groceries, Rent, Utilities'} 
+                        value={transactionInfo.text}
                         disabled={isSubmitting}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 placeholder-gray-400 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-200 placeholder-gray-400 disabled:bg-gray-100 disabled:cursor-not-allowed"
                         maxLength={200}
                         required
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                        {expenseInfo.text.length}/200 characters
+                        {transactionInfo.text.length}/200 characters
                     </p>
                 </div>
 
@@ -76,24 +91,32 @@ function ExpenseForm({ addTransaction }) {
                     <label htmlFor='amount' className="block text-sm font-medium text-gray-700 mb-2">
                         Amount (₹) *
                     </label>
-                    <input 
-                        onChange={handleChange}
-                        type='number' 
-                        name='amount' 
-                        id='amount'
-                        placeholder='Enter amount (+ for income, - for expense)' 
-                        value={expenseInfo.amount}
-                        disabled={isSubmitting}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 placeholder-gray-400 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                        step="0.01"
-                        required
-                    />
+                    <div className="relative">
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">₹</span>
+                        <input 
+                            onChange={handleChange}
+                            type='number' 
+                            name='amount' 
+                            id='amount'
+                            placeholder='0.00' 
+                            value={transactionInfo.amount}
+                            disabled={isSubmitting}
+                            className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-200 placeholder-gray-400 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                            step="0.01"
+                            min="0"
+                            required
+                        />
+                    </div>
                 </div>
 
                 <button 
                     type='submit'
-                    disabled={isSubmitting || !expenseInfo.text.trim() || !expenseInfo.amount}
-                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition duration-200 transform hover:scale-105 disabled:hover:scale-100 shadow-lg flex items-center justify-center"
+                    disabled={isSubmitting || !transactionInfo.text.trim() || !transactionInfo.amount}
+                    className={`w-full font-semibold py-3 px-6 rounded-xl transition duration-200 transform hover:scale-105 disabled:hover:scale-100 shadow-lg flex items-center justify-center ${
+                        isIncome
+                            ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 disabled:from-gray-400 disabled:to-gray-500 text-white'
+                            : 'bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 disabled:from-gray-400 disabled:to-gray-500 text-white'
+                    } disabled:cursor-not-allowed`}
                 >
                     {isSubmitting ? (
                         <>
@@ -104,21 +127,36 @@ function ExpenseForm({ addTransaction }) {
                             Adding...
                         </>
                     ) : (
-                        'Add Transaction'
+                        <>
+                            <span className="mr-2">{isIncome ? '➕' : '➖'}</span>
+                            Add {isIncome ? 'Income' : 'Expense'}
+                        </>
                     )}
                 </button>
             </form>
 
-            <div className="mt-6 space-y-3">
-                <div className="p-3 bg-blue-50 rounded-lg">
-                    <p className="text-sm text-blue-700">
-                        💡 <strong>Tip:</strong> Use positive numbers for income and negative numbers for expenses
+            <div className="space-y-3">
+                <div className={`p-4 rounded-xl ${
+                    isIncome 
+                        ? 'bg-green-50 border border-green-200' 
+                        : 'bg-green-50 border border-green-200'
+                }`}>
+                    <p className={`text-sm ${
+                        isIncome ? 'text-green-700' : 'text-green-700'
+                    }`}>
+                        💡 <strong>Tip:</strong> {isIncome 
+                            ? 'Record all your income sources including salary, bonuses, and side hustles' 
+                            : 'Track all your expenses to understand your spending patterns'
+                        }
                     </p>
                 </div>
                 
-                <div className="p-3 bg-yellow-50 rounded-lg">
-                    <p className="text-sm text-yellow-700">
-                        📝 <strong>Examples:</strong> +50000 (Salary), -1200 (Groceries), -25000 (Rent)
+                <div className="p-4 bg-gray-50 rounded-xl">
+                    <p className="text-sm text-gray-600">
+                        📝 <strong>Examples:</strong> {isIncome 
+                            ? 'Salary (₹50000), Freelance (₹15000), Bonus (₹25000)' 
+                            : 'Groceries (₹1200), Rent (₹25000), Utilities (₹800)'
+                        }
                     </p>
                 </div>
             </div>

@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const TransactionSchema = new mongoose.Schema({
+    userId: {
+        type: String,
+        required: [true, 'User ID is required']
+    },
     text: {
         type: String,
         required: [true, 'Transaction description is required'],
@@ -50,8 +54,8 @@ TransactionSchema.virtual('type').get(function() {
 });
 
 // Index for better query performance
-TransactionSchema.index({ createdAt: -1 });
-TransactionSchema.index({ amount: 1 });
+TransactionSchema.index({ userId: 1, createdAt: -1 });
+TransactionSchema.index({ userId: 1, amount: 1 });
 
 // Pre-save middleware to update the updatedAt field
 TransactionSchema.pre('save', function(next) {
@@ -59,16 +63,16 @@ TransactionSchema.pre('save', function(next) {
     next();
 });
 
-// Static method to get summary
-TransactionSchema.statics.getSummary = async function() {
-    const transactions = await this.find();
+// Static method to get summary for a specific user
+TransactionSchema.statics.getSummary = async function(userId) {
+    const transactions = await this.find({ userId });
     
     const summary = {
         totalTransactions: transactions.length,
         totalIncome: 0,
         totalExpense: 0,
         balance: 0,
-        recentTransactions: await this.find().sort({ createdAt: -1 }).limit(5)
+        recentTransactions: await this.find({ userId }).sort({ createdAt: -1 }).limit(5)
     };
     
     transactions.forEach(transaction => {

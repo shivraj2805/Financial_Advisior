@@ -15,6 +15,7 @@ const schemesRoutes = require("./routes/schemeRoutes");
 const ocrRoutes = require("./routes/ocr");
 const transactionsRouter = require('./routes/transactions');
 const meetingsRoutes = require('./routes/meetings');
+const authRoutes = require('./routes/AuthRouter');
 
 const app = express();
 const http = require('http').createServer(app);
@@ -71,9 +72,32 @@ app.use("/api/schemes", schemesRoutes);
 app.use("/api/ocr", ocrRoutes);
 app.use('/api/transactions', transactionsRouter);
 app.use('/api/meetings', meetingsRoutes);
+app.use('/api/auth', authRoutes);
 
 app.get("/ping", (req, res) => {
   res.send("Hello Server");
+});
+
+// Test endpoint to verify authentication
+app.get("/api/test-auth", (req, res) => {
+  const authHeader = req.headers["authorization"];
+  console.log("Auth header:", authHeader);
+  
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ 
+      message: "No token provided",
+      authHeader: authHeader 
+    });
+  }
+
+  const token = authHeader.split(" ")[1];
+  console.log("Token:", token.substring(0, 20) + "...");
+  
+  res.json({ 
+    message: "Token received", 
+    tokenLength: token.length,
+    hasToken: !!token
+  });
 });
 
 // --- SOCKET.IO SETUP ---

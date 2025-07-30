@@ -1,65 +1,47 @@
 import React, { createContext, useState, useEffect } from "react";
-import axios from "axios";
+import { useAuth } from "@clerk/clerk-react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(null);
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem("token") || "");
+  const { isSignedIn, isLoaded, user } = useAuth();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    if (isLoaded) {
+      setIsAuthenticated(isSignedIn);
+      if (isSignedIn && user) {
+        setUserData({
+          id: user.id,
+          email: user.emailAddresses?.[0]?.emailAddress,
+          name: user.fullName || user.firstName || user.emailAddresses?.[0]?.emailAddress,
+          profilePicture: user.imageUrl
+        });
+      } else {
+        setUserData(null);
+      }
+    }
+  }, [isLoaded, isSignedIn, user]);
 
   const login = (token, user, name, profilePicture) => {
-    localStorage.setItem("token", token);
-    localStorage.setItem("loggedInUser", name);
-    localStorage.setItem(
-      "profilePicture",
-      profilePicture ||
-        "https://flowbite.com/docs/images/people/profile-picture-3.jpg"
-    );
-    setToken(token);
-    setUser(user);
-    setIsAuthenticated(true);
+    // This function is kept for compatibility but Clerk handles login
+    console.log("Login handled by Clerk");
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("loggedInUser");
-    localStorage.removeItem("profilePicture");
-    setToken("");
-    setUser(null);
-    setIsAuthenticated(false);
+    // Clerk handles logout automatically
+    console.log("Logout handled by Clerk");
   };
 
-  useEffect(() => {
-    const verifyToken = async () => {
-      const token = localStorage.getItem("token");
-      if (token) {
-        try {
-          const response = await axios.get(
-            `process.env.BACKEND_URL/api/auth/verify`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
-          if (response.data.user) {
-            setUser(response.data.user);
-            setIsAuthenticated(true);
-          } else {
-            logout();
-          }
-        } catch (error) {
-          console.error("Token verification failed:", error);
-          logout();
-        }
-      } else {
-        logout();
-      }
-    };
-    verifyToken();
-  }, []);
-
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+    <AuthContext.Provider value={{ 
+      isAuthenticated, 
+      user: userData, 
+      login, 
+      logout,
+      isLoaded 
+    }}>
       {children}
     </AuthContext.Provider>
   );

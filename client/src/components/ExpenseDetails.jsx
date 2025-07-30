@@ -2,80 +2,127 @@ import React from 'react'
 
 function ExpenseDetails({ incomeAmt, expenseAmt, stats }) {
     const balance = incomeAmt - expenseAmt;
-    
+    const isPositive = balance >= 0;
+
     return (
-        <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
-            <div className="text-center mb-6">
-                <h2 className="text-lg font-semibold text-gray-700 mb-2">Your Balance</h2>
-                <div className={`text-4xl font-bold ${
-                    balance >= 0 ? 'text-green-600' : 'text-red-600'
-                }`}>
-                    ₹{balance.toLocaleString('en-IN')}
-                </div>
-                {stats && (
-                    <p className="text-sm text-gray-500 mt-2">
-                        Based on {stats.totalTransactions} transactions
+        <div className="space-y-6">
+            {/* Main Balance Card */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-green-100">
+                <div className="text-center mb-6">
+                    <h2 className="text-2xl font-bold text-gray-800 mb-2">Current Balance</h2>
+                    <div className={`text-4xl font-bold ${
+                        isPositive ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                        ₹{Math.abs(balance).toLocaleString()}
+                    </div>
+                    <p className={`text-sm font-medium ${
+                        isPositive ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                        {isPositive ? '💰 You\'re in the green!' : '⚠️ You\'re in the red'}
                     </p>
-                )}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Income Card */}
-                <div className="bg-gradient-to-r from-green-400 to-green-600 rounded-xl p-4 text-white transform hover:scale-105 transition-transform duration-200">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-green-100 text-sm font-medium">Total Income</p>
-                            <p className="text-2xl font-bold">₹{incomeAmt.toLocaleString('en-IN')}</p>
-                            {stats && (
-                                <p className="text-green-100 text-xs mt-1">
-                                    {stats.totalIncome ? `₹${stats.totalIncome.toLocaleString('en-IN')}` : 'No data'}
-                                </p>
-                            )}
-                        </div>
-                        <div className="bg-white bg-opacity-20 rounded-full p-3">
-                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clipRule="evenodd" />
-                            </svg>
-                        </div>
-                    </div>
                 </div>
 
-                {/* Expense Card */}
-                <div className="bg-gradient-to-r from-red-400 to-red-600 rounded-xl p-4 text-white transform hover:scale-105 transition-transform duration-200">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-red-100 text-sm font-medium">Total Expense</p>
-                            <p className="text-2xl font-bold">₹{expenseAmt.toLocaleString('en-IN')}</p>
-                            {stats && (
-                                <p className="text-red-100 text-xs mt-1">
-                                    {stats.totalExpense ? `₹${stats.totalExpense.toLocaleString('en-IN')}` : 'No data'}
-                                </p>
-                            )}
+                {/* Income vs Expense Bars */}
+                <div className="space-y-4">
+                    <div>
+                        <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm font-medium text-green-600">Income</span>
+                            <span className="text-sm font-bold text-green-600">₹{incomeAmt.toLocaleString()}</span>
                         </div>
-                        <div className="bg-white bg-opacity-20 rounded-full p-3">
-                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z" clipRule="evenodd" />
-                            </svg>
+                        <div className="w-full bg-gray-200 rounded-full h-3">
+                            <div 
+                                className="bg-gradient-to-r from-green-500 to-emerald-600 h-3 rounded-full transition-all duration-500"
+                                style={{ width: `${incomeAmt > 0 ? Math.min((incomeAmt / (incomeAmt + expenseAmt)) * 100, 100) : 0}%` }}
+                            ></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm font-medium text-green-600">Expenses</span>
+                            <span className="text-sm font-bold text-green-600">₹{expenseAmt.toLocaleString()}</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-3">
+                            <div 
+                                className="bg-gradient-to-r from-green-600 to-teal-600 h-3 rounded-full transition-all duration-500"
+                                style={{ width: `${expenseAmt > 0 ? Math.min((expenseAmt / (incomeAmt + expenseAmt)) * 100, 100) : 0}%` }}
+                            ></div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Quick Stats */}
-            {balance !== 0 && (
-                <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                    <div className="flex justify-between items-center text-sm">
-                        <span className="text-gray-600">
-                            {balance > 0 ? 'Savings Rate:' : 'Overspending:'}
-                        </span>
-                        <span className={`font-semibold ${
-                            balance > 0 ? 'text-green-600' : 'text-red-600'
-                        }`}>
-                            {incomeAmt > 0 ? Math.abs((balance / incomeAmt) * 100).toFixed(1) : 0}%
-                        </span>
+            {/* Statistics Cards */}
+            {stats && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 shadow-lg border border-green-100">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-medium text-green-600">Total Income</p>
+                                <p className="text-2xl font-bold text-green-700">₹{stats.totalIncome?.toLocaleString() || '0'}</p>
+                            </div>
+                            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                                <span className="text-green-600 text-xl">💰</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-gradient-to-r from-green-50 to-teal-50 rounded-2xl p-6 shadow-lg border border-green-100">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-medium text-green-600">Total Expenses</p>
+                                <p className="text-2xl font-bold text-green-700">₹{stats.totalExpense?.toLocaleString() || '0'}</p>
+                            </div>
+                            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                                <span className="text-green-600 text-xl">💸</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-6 shadow-lg border border-green-100">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-medium text-green-600">Transactions</p>
+                                <p className="text-2xl font-bold text-green-700">{stats.totalTransactions || 0}</p>
+                            </div>
+                            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                                <span className="text-green-600 text-xl">📊</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}
+
+            {/* Quick Insights */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-green-100">
+                <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">💡 Quick Insights</h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                    <div className="text-center p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl">
+                        <div className="text-2xl mb-2">📈</div>
+                        <p className="text-sm text-green-600">
+                            {incomeAmt > 0 ? `Your income is ₹${incomeAmt.toLocaleString()}` : 'No income recorded yet'}
+                        </p>
+                    </div>
+                    <div className="text-center p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl">
+                        <div className="text-2xl mb-2">📉</div>
+                        <p className="text-sm text-green-600">
+                            {expenseAmt > 0 ? `Your expenses are ₹${expenseAmt.toLocaleString()}` : 'No expenses recorded yet'}
+                        </p>
+                    </div>
+                    <div className="text-center p-4 bg-gradient-to-r from-teal-50 to-green-50 rounded-xl">
+                        <div className="text-2xl mb-2">🎯</div>
+                        <p className="text-sm text-green-600">
+                            {isPositive ? 'Great job! You\'re saving money' : 'Consider reducing expenses'}
+                        </p>
+                    </div>
+                    <div className="text-center p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl">
+                        <div className="text-2xl mb-2">📅</div>
+                        <p className="text-sm text-green-600">
+                            Last updated: {new Date().toLocaleDateString()}
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
     )
 }

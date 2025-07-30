@@ -1,10 +1,21 @@
 const Transaction = require('../models/Transaction');
 
-// Get all transactions
+// Get all transactions for the authenticated user
 exports.getTransactions = async (req, res) => {
     try {
-        const transactions = await Transaction.find().sort({ createdAt: -1 });
-        console.log(`Fetched ${transactions.length} transactions`);
+        const userId = req.user?.id || req.user?._id;
+        
+        if (!userId) {
+            return res.status(401).json({ 
+                error: 'Authentication required',
+                message: 'User not authenticated' 
+            });
+        }
+
+        console.log('Getting transactions for user:', userId);
+
+        const transactions = await Transaction.find({ userId }).sort({ createdAt: -1 });
+        console.log(`Fetched ${transactions.length} transactions for user ${userId}`);
         res.json(transactions);
     } catch (err) {
         console.error('Error fetching transactions:', err.message);
@@ -16,9 +27,20 @@ exports.getTransactions = async (req, res) => {
     }
 };
 
-// Add a new transaction
+// Add a new transaction for the authenticated user
 exports.addTransaction = async (req, res) => {
     try {
+        const userId = req.user?.id || req.user?._id;
+        
+        if (!userId) {
+            return res.status(401).json({ 
+                error: 'Authentication required',
+                message: 'User not authenticated' 
+            });
+        }
+
+        console.log('Adding transaction for user:', userId);
+
         const { text, amount } = req.body;
         
         // Validation
@@ -37,14 +59,15 @@ exports.addTransaction = async (req, res) => {
             });
         }
 
-        // Create new transaction
+        // Create new transaction with userId
         const transaction = new Transaction({ 
+            userId,
             text: text.trim(), 
             amount: parsedAmount 
         });
         
         const savedTransaction = await transaction.save();
-        console.log('Transaction created:', savedTransaction._id);
+        console.log('Transaction created:', savedTransaction._id, 'for user:', userId);
         
         res.status(201).json(savedTransaction);
     } catch (err) {
@@ -66,9 +89,20 @@ exports.addTransaction = async (req, res) => {
     }
 };
 
-// Delete a transaction
+// Delete a transaction (only if it belongs to the authenticated user)
 exports.deleteTransaction = async (req, res) => {
     try {
+        const userId = req.user?.id || req.user?._id;
+        
+        if (!userId) {
+            return res.status(401).json({ 
+                error: 'Authentication required',
+                message: 'User not authenticated' 
+            });
+        }
+
+        console.log('Deleting transaction for user:', userId);
+
         const { id } = req.params;
         
         // Validate ObjectId
@@ -79,16 +113,20 @@ exports.deleteTransaction = async (req, res) => {
             });
         }
         
-        const transaction = await Transaction.findByIdAndDelete(id);
+        // Find and delete transaction, ensuring it belongs to the user
+        const transaction = await Transaction.findOneAndDelete({ 
+            _id: id, 
+            userId 
+        });
         
         if (!transaction) {
             return res.status(404).json({ 
                 error: 'Not found',
-                message: 'Transaction not found' 
+                message: 'Transaction not found or you do not have permission to delete it' 
             });
         }
         
-        console.log('Transaction deleted:', id);
+        console.log('Transaction deleted:', id, 'for user:', userId);
         res.json({ 
             message: 'Transaction deleted successfully', 
             id,
@@ -104,10 +142,21 @@ exports.deleteTransaction = async (req, res) => {
     }
 };
 
-// Get transaction statistics
+// Get transaction statistics for the authenticated user
 exports.getTransactionStats = async (req, res) => {
     try {
-        const transactions = await Transaction.find();
+        const userId = req.user?.id || req.user?._id;
+        
+        if (!userId) {
+            return res.status(401).json({ 
+                error: 'Authentication required',
+                message: 'User not authenticated' 
+            });
+        }
+
+        console.log('Getting stats for user:', userId);
+
+        const transactions = await Transaction.find({ userId });
         
         const stats = {
             totalTransactions: transactions.length,
@@ -126,6 +175,7 @@ exports.getTransactionStats = async (req, res) => {
         
         stats.balance = stats.totalIncome - stats.totalExpense;
         
+        console.log(`Stats calculated for user ${userId}:`, stats);
         res.json(stats);
     } catch (err) {
         console.error('Error getting stats:', err.message);
