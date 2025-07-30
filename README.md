@@ -22,10 +22,11 @@ GEMINI_API_KEY="your gemini api key" <br>
 #.env.local file for frontend
 
 REACT_APP_YOUTUBE_API_KEY = "your you tube api key" <br>
-REACT_APP_NEWS_API_KEY = "api key for news fetching" <br>
+REACT_APP_NEWS_API_KEY = "api key for news fetching" <br> 
 VITE_CLERK_PUBLISHABLE_KEY=your clerk authentication key <br>
 REACT_APP_BACKEND_URL=http://localhost:8080 <br>
 
+#get news , u tube api key from "https://newsdata.io"
 
 
 ##For more information contact - darekar1005@gmail.com
