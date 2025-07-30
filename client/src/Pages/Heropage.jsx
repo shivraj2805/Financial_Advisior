@@ -197,6 +197,19 @@ const translations = {
           link: "/expenses",
           icon: Receipt,
         },
+        {
+          title: "Security Checker", 
+          description: "Verify the security of financial websites and protect yourself from online fraud",
+          link: "/securitycheck",
+          icon: Shield,
+        },
+
+        {
+          title: "Fun And Learn", 
+          description: "Learn financial concepts through interactive games and quizzes",
+          link: "/game",
+          icon: BookOpen,
+        },
       ]
       
     },

@@ -30,27 +30,27 @@ const RoadmapWithModals = () => {
    const steps = [
     {
       id: 1,
-      title: "बुनियादी वित्तीय जानकारी",
+      title: "Basic Financial Literacy",
       icon: CircleDollarSign,
-      description: "पैसे को सही तरीके से संभालने और बचत करने की समझ हासिल करें",
+      description: "Learn to manage money properly and develop saving habits",
       videoId: "WN9Mks1s4tM",
       article: {
-        intro: "पैसे को सही तरीके से संभालने की बुनियादी जानकारी लें।",
+        intro: "Start your financial journey with basic money management knowledge.",
         sections: [
           {
-            title: "आय और खर्च को समझना",
-            content: "अपनी आय और खर्चों का सही तरीके से हिसाब रखें।",
+            title: "Understanding Income and Expenses",
+            content: "Track your income and expenses systematically.",
             points: [
-              "मासिक आय और खर्चों की लिस्ट बनाएं",
-              "थोड़ी-थोड़ी बचत करें, जैसे ₹10 रोज़"
+              "Create a monthly income and expense list",
+              "Start small savings, like ₹10 daily"
             ],
           },
           {
-            title: "बैंकिंग के फायदे",
-            content: "बैंक खाता खोलने और बैंकिंग सेवाओं का उपयोग करने के लाभ जानें।",
+            title: "Benefits of Banking",
+            content: "Learn the advantages of opening a bank account and using banking services.",
             points: [
-              "साधारण बचत खाता खोलें",
-              "नकद जमा और निकासी के तरीके सीखें"
+              "Open a basic savings account",
+              "Learn cash deposit and withdrawal methods"
             ],
           },
         ],
@@ -58,19 +58,19 @@ const RoadmapWithModals = () => {
     },
     {
       id: 2,
-      title: "बैंक खाता खोलना",
+      title: "Opening a Bank Account",
       icon: PiggyBank,
-      description: "अपने पैसे को सुरक्षित रखने के लिए बैंक खाता खोलें",
+      description: "Open a bank account to keep your money safe and secure",
       videoId: "abc67890",
       article: {
-        intro: "बैंक खाता खोलने के बाद, सेविंग्स और निवेश के विकल्पों को जानें।",
+        intro: "After opening a bank account, explore savings and investment options.",
         sections: [
           {
-            title: "सावधनी जमा और एफडी",
-            content: "बैंक में पैसे जमा करना और सुरक्षित निवेश के बारे में समझें।",
+            title: "Savings Deposits and Fixed Deposits",
+            content: "Understand depositing money in banks and secure investments.",
             points: [
-              "फिक्स्ड डिपॉजिट और आरडी के बारे में जानें",
-              "बैंक में पैसा जमा करना सीखें"
+              "Learn about Fixed Deposits and Recurring Deposits",
+              "Learn to deposit money in banks"
             ],
           },
         ],
@@ -78,19 +78,19 @@ const RoadmapWithModals = () => {
     },
     {
       id: 3,
-      title: "ऋण और क्रेडिट को समझना",
+      title: "Understanding Loans and Credit",
       icon: CreditCard,
-      description: "ऋण और क्रेडिट का सही उपयोग करें और समय पर चुकौती करें",
+      description: "Use loans and credit properly and repay on time",
       videoId: "def11223",
       article: {
-        intro: "ऋण का सही उपयोग और चुकौती की अहमियत को समझें।",
+        intro: "Understand the proper use of loans and importance of timely repayment.",
         sections: [
           {
-            title: "अच्छे और बुरे ऋण का अंतर",
-            content: "ऋण का उपयोग सही जगह पर करें।",
+            title: "Difference Between Good and Bad Loans",
+            content: "Use loans for the right purposes.",
             points: [
-              "कृषि, व्यवसाय या शिक्षा के लिए ऋण लें",
-              "अनौपचारिक ऋण से बचें"
+              "Take loans for agriculture, business, or education",
+              "Avoid informal loans"
             ],
           },
         ],
@@ -98,19 +98,19 @@ const RoadmapWithModals = () => {
     },
     {
       id: 4,
-      title: "आपातकालीन फंड और भविष्य के लिए बचत",
+      title: "Emergency Fund and Future Savings",
       icon: Save,
-      description: "आपातकाल और भविष्य के लिए पैसे बचाने और निवेश करने की आदत डालें",
+      description: "Develop habits of saving and investing for emergencies and future needs",
       videoId: "ghi45678",
       article: {
-        intro: "आपातकाल और भविष्य के लिए धन सुरक्षित करने की महत्वता समझें।",
+        intro: "Understand the importance of securing funds for emergencies and future.",
         sections: [
           {
-            title: "आपातकालीन फंड बनाना",
-            content: "अचानक होने वाली समस्याओं के लिए पैसे बचाएं।",
+            title: "Creating Emergency Fund",
+            content: "Save money for unexpected problems.",
             points: [
-              "जरूरी खर्चों के लिए बचत करना शुरू करें",
-              "नियमित जमा करें"
+              "Start saving for essential expenses",
+              "Make regular deposits"
             ],
           },
         ],
@@ -118,19 +118,19 @@ const RoadmapWithModals = () => {
     },
     {
       id: 5,
-      title: "बीमा और सुरक्षित निवेश",
+      title: "Insurance and Secure Investments",
       icon: Shield,
-      description: "स्वास्थ्य, जीवन और फसल बीमा के महत्व को जानें और सुरक्षित निवेश करें",
+      description: "Learn the importance of health, life, and crop insurance and make secure investments",
       videoId: "jkl78901",
       article: {
-        intro: "बीमा और सुरक्षित निवेश के बारे में जानकारी प्राप्त करें।",
+        intro: "Get information about insurance and secure investments.",
         sections: [
           {
-            title: "स्वास्थ्य और जीवन बीमा",
-            content: "बीमा से परिवार को सुरक्षा मिलती है।",
+            title: "Health and Life Insurance",
+            content: "Insurance provides protection to the family.",
             points: [
-              "सरकारी बीमा योजनाओं में शामिल हों",
-              "कृषि बीमा के विकल्प देखें"
+              "Join government insurance schemes",
+              "Explore agricultural insurance options"
             ],
           },
         ],
@@ -138,19 +138,99 @@ const RoadmapWithModals = () => {
     },
     {
       id: 6,
-      title: "डिजिटल टूल का इस्तेमाल",
+      title: "Using Digital Tools",
       icon: PhoneCall,
-      description: "मोबाइल बैंकिंग और ऑनलाइन भुगतान के जरिए लेन-देन करना सीखें",
+      description: "Learn to conduct transactions through mobile banking and online payments",
       videoId: "mno34567",
       article: {
-        intro: "डिजिटल टूल्स के साथ सुरक्षित लेन-देन करना सीखें।",
+        intro: "Learn to conduct secure transactions with digital tools.",
         sections: [
           {
-            title: "मोबाइल बैंकिंग और यूपीआई",
-            content: "डिजिटल प्लेटफार्म पर पैसे भेजना और प्राप्त करना सीखें।",
+            title: "Mobile Banking and UPI",
+            content: "Learn to send and receive money on digital platforms.",
             points: [
-              "गूगल पे या पेटीएम जैसी ऐप्स पर ट्रांजैक्शन करें",
-              "ऑनलाइन धोखाधड़ी से बचें"
+              "Set up UPI for easy payments",
+              "Use mobile banking apps safely"
+            ],
+          },
+        ],
+      },
+    },
+    {
+      id: 7,
+      title: "Government Schemes and Benefits",
+      icon: BookOpen,
+      description: "Learn about government financial schemes and how to benefit from them",
+      videoId: "pqr89012",
+      article: {
+        intro: "Explore government schemes designed for financial inclusion.",
+        sections: [
+          {
+            title: "PMJDY and Financial Inclusion",
+            content: "Access to basic banking services for all.",
+            points: [
+              "Open Jan Dhan Yojana account",
+              "Avail government subsidies directly"
+            ],
+          },
+        ],
+      },
+    },
+    {
+      id: 8,
+      title: "Investment Planning",
+      icon: Star,
+      description: "Plan your investments based on goals and risk tolerance",
+      videoId: "stu23456",
+      article: {
+        intro: "Create a personalized investment strategy for your financial goals.",
+        sections: [
+          {
+            title: "Setting Financial Goals",
+            content: "Define clear financial objectives and timelines.",
+            points: [
+              "Short-term goals (1-3 years)",
+              "Long-term goals (5+ years)"
+            ],
+          },
+        ],
+      },
+    },
+    {
+      id: 9,
+      title: "Tax Planning and Compliance",
+      icon: CheckCircle2,
+      description: "Understand tax obligations and plan your finances accordingly",
+      videoId: "vwx56789",
+      article: {
+        intro: "Learn about tax planning and compliance requirements.",
+        sections: [
+          {
+            title: "Income Tax Basics",
+            content: "Understand your tax obligations and benefits.",
+            points: [
+              "File income tax returns on time",
+              "Claim eligible deductions"
+            ],
+          },
+        ],
+      },
+    },
+    {
+      id: 10,
+      title: "Retirement Planning",
+      icon: Eye,
+      description: "Start planning for retirement early with proper investment strategies",
+      videoId: "yza12345",
+      article: {
+        intro: "Begin retirement planning early for a secure financial future.",
+        sections: [
+          {
+            title: "Pension Schemes and NPS",
+            content: "Explore government and private pension options.",
+            points: [
+              "Join National Pension System (NPS)",
+              "Consider EPF and PPF options"
             ],
           },
         ],
@@ -208,7 +288,7 @@ const RoadmapWithModals = () => {
           {/* Progress Bar */}
           <div className="px-8 pt-8">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-green-700 font-semibold text-lg">प्रगति</span>
+              <span className="text-green-700 font-semibold text-lg">Progress</span>
               <span className="text-green-700 font-semibold text-lg">{progressPercent}%</span>
             </div>
             <div className="w-full bg-green-100 rounded-full h-3">
@@ -221,8 +301,8 @@ const RoadmapWithModals = () => {
 
           {/* Header Section */}
           <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-t-3xl p-10 text-white shadow-lg mt-4 animate-fadeIn">
-            <h1 className="text-4xl font-extrabold mb-2 tracking-tight drop-shadow-lg">वित्तीय शिक्षा यात्रा</h1>
-            <p className="text-green-100 text-lg">अपनी वित्तीय यात्रा को आगे बढ़ाएं और सीखें</p>
+            <h1 className="text-4xl font-extrabold mb-2 tracking-tight drop-shadow-lg">Financial Education Journey</h1>
+            <p className="text-green-100 text-lg">Advance your financial journey and learn</p>
           </div>
 
           {/* Main Roadmap */}
@@ -252,7 +332,7 @@ const RoadmapWithModals = () => {
                         style={{ boxShadow: "0 8px 32px 0 rgba(34,197,94,0.15)" }}
                       >
                         <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold bg-white text-green-700 px-3 py-1 rounded-full shadow border border-green-100">
-                          चरण {index + 1}
+                          Step {index + 1}
                         </span>
                         {isCompleted ? (
                           <CheckCircle2 size={40} className="drop-shadow-md animate-bounce" />
@@ -283,7 +363,7 @@ const RoadmapWithModals = () => {
                             }`}
                         >
                           {stepProgress.video ? <CheckCircle2 size={20} /> : <Play size={20} />}
-                          <span>{stepProgress.video ? "पूर्ण किया गया" : "वीडियो देखें"}</span>
+                          <span>{stepProgress.video ? "Completed" : "Watch Video"}</span>
                         </button>
                         <button
                           onClick={() => openArticle(step)}
@@ -294,7 +374,7 @@ const RoadmapWithModals = () => {
                             }`}
                         >
                           {stepProgress.article ? <CheckCircle2 size={20} /> : <BookOpen size={20} />}
-                          <span>{stepProgress.article ? "पढ़ा गया" : "लेख पढ़ें"}</span>
+                          <span>{stepProgress.article ? "Read" : "Read Article"}</span>
                         </button>
                       </div>
                     </div>
