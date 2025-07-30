@@ -98,7 +98,7 @@ Please provide an in-depth, long-form analysis roughly 2 to 3 pages long. Struct
 
 Ensure the entire response is written exclusively in ${preferred_language}. Use clear, formal, and engaging language that educates ${name}, emphasizing practical and customized advice. Address ${name} directly throughout the response to make it more personal and relevant. Avoid brevity and elaborate on each section with rich detail so ${name} gains a deep understanding and a concrete roadmap to follow.
 
-Make the advice feel personal and directly addressed to ${name}, using their name throughout the response to create a more engaging and personalized experience.`;
+Make the advice feel personal and directly addressed to ${name}, using their name throughout the response to create a more engaging and personalized experience and in ans do not provide date.`;
 
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 

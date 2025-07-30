@@ -252,7 +252,7 @@ const Hero = () => {
           </div>
           {/* Overlay Caption */}
           <div className="absolute bottom-6 left-6 bg-green-700/90 text-white text-lg px-5 py-3 rounded-xl shadow-lg pointer-events-none font-semibold backdrop-blur">
-            See your money grow in 3D!
+           Secure Your Future For Better Life !
           </div>
         </div>
       </div>
