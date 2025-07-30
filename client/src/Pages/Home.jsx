@@ -34,12 +34,7 @@ const HomePage = () => {
       description: "Stay updated with the latest tech news",
       link: "/news",
     },
-    {
-      icon: Newspaper,
-      title: "Micronvestment Opportunites",
-      description: "Explore the latest investment opportunities",
-      link: "/mip",
-    },
+
   ];
 
   // Cursor and snake trail logic

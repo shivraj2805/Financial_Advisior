@@ -9,6 +9,19 @@ const MicroinvestmentPlatform = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [language, setLanguage] = useState('hi');
 
+  const categories = {
+    all: { hi: "सभी श्रेणियां", en: "All Categories" },
+    banking: { hi: "बैंकिंग", en: "Banking" },
+    community: { hi: "समुदाय", en: "Community" },
+    business: { hi: "व्यवसाय", en: "Business" },
+    gold: { hi: "सोना", en: "Gold" },
+    agriculture: { hi: "कृषि", en: "Agriculture" },
+    market: { hi: "बाजार", en: "Market" },
+    digital: { hi: "डिजिटल", en: "Digital" },
+    government: { hi: "सरकारी", en: "Government" },
+    "rural-business": { hi: "ग्रामीण व्यवसाय", en: "Rural Business" }
+  };
+
   const translations = {
     hi: {
       title: "सूक्ष्म निवेश के अवसर",
@@ -158,6 +171,20 @@ const MicroinvestmentPlatform = () => {
       returns: "8-9%",
       icon: <Landmark className="w-6 h-6" />,
       category: "government"
+    },
+    {
+      title: {
+        hi: "ग्रामीण व्यवसाय निवेश",
+        en: "Rural Business Investment"
+      },
+      description: {
+        hi: "पोल्ट्री फार्मिंग, डेयरी फार्मिंग और अन्य ग्रामीण व्यवसायों में निवेश।",
+        en: "Investment in poultry farming, dairy farming, and other rural business ventures."
+      },
+      minAmount: "₹25,000",
+      returns: "18-25%",
+      icon: <Tractor className="w-6 h-6" />,
+      category: "rural-business"
     }
   ];
 
@@ -196,9 +223,30 @@ const MicroinvestmentPlatform = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-16">
+        {/* Category Filter */}
+        <div className="mb-8">
+          <div className="flex flex-wrap gap-3 justify-center">
+            {Object.entries(categories).map(([key, value]) => (
+              <button
+                key={key}
+                onClick={() => setSelectedCategory(key)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                  selectedCategory === key
+                    ? 'bg-green-600 text-white shadow-lg shadow-green-200'
+                    : 'bg-white text-gray-600 hover:bg-gray-50 shadow-md'
+                }`}
+              >
+                {value[language]}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Investment Options Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {investmentOptions.map((option, index) => (
+          {investmentOptions
+            .filter(option => selectedCategory === 'all' || option.category === selectedCategory)
+            .map((option, index) => (
             <div
               key={index}
               className="group bg-gradient-to-br from-white to-green-50 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden border border-green-100"

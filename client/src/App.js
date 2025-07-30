@@ -17,6 +17,7 @@ import ChatbotButton from "./components/ChatbobtButton";
 import MicroinvestmentPlatform from "./Pages/mip";
 import PoultryFarmGuide from "./Pages/poultry";
 import RuralBusinessOpportunities from "./Pages/ruralbusiness";
+import BusinessGuide from "./Pages/BusinessGuide";
 import Chatbot from "./Pages/chatbot";
 import DiscussionForums from "./Pages/community";
 import DairyForumPage from "./Pages/dairyforum";
@@ -61,6 +62,7 @@ function App() {
         <Route path="/mip" element={<ProtectedRoute><MicroinvestmentPlatform /></ProtectedRoute>} />
         <Route path="/poultry" element={<ProtectedRoute><PoultryFarmGuide /></ProtectedRoute>} />
         <Route path="/rural" element={<ProtectedRoute><RuralBusinessOpportunities /></ProtectedRoute>} />
+        <Route path="/business-guide/:businessType" element={<ProtectedRoute><BusinessGuide /></ProtectedRoute>} />
         <Route path="/community" element={<ProtectedRoute><DiscussionForums /></ProtectedRoute>} />
 
         <Route path="/chatbot" element={<Chatbot />} />        

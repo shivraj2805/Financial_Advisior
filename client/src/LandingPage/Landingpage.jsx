@@ -159,15 +159,10 @@ const translations = {
         //   link: "/road",
         //   icon: Map,
         // },
+
         {
-          title: "Microinvestment Opportunities",
-          description: "Explore the latest investment opportunities for small investors",
-          link: "/mip",
-          icon: BadgeDollarSign,
-        },
-        {
-          title: "Rural Business Opportunities",
-          description: "Explore business opportunities in rural India",
+          title: "Business Opportunities",
+          description: "Explore business opportunities in India",
           link: "/rural",
           icon: Briefcase,
         },
@@ -254,45 +249,6 @@ const translations = {
           icon: "🤝",
           youtubeId: "EsrJ_NKBkww",
         },
-      ],
-    },
-    businessIdeas: {
-      title: "Trending Business Ideas",
-      subtitle: "Scroll to explore opportunities",
-      ideas: [
-        
-          {
-            title: "Poultry Farming",
-            description: "Start your own chicken and egg production farm",
-            icon: "🐔",
-          },
-          {
-            title: "Local Grocery Store",
-            description: "Set up a store for essential food and household items",
-            icon: "🛒",
-          },
-          {
-            title: "Fishery Business",
-            description: "Raise and sell fish for local and regional markets",
-            icon: "🐟",
-          },
-          {
-            title: "Organic Farming",
-            description: "Cultivate and sell organic fruits and vegetables",
-            icon: "🥦",
-          },
-          {
-            title: "Dairy Farming",
-            description: "Produce milk and other dairy products",
-            icon: "🐄",
-          },
-          {
-            title: "Handicrafts",
-            description: "Make and sell handmade goods like baskets and pottery",
-            icon: "🎨",
-          },
-        
-        
       ],
     },
   },
@@ -386,48 +342,12 @@ const translations = {
         },
       ],
     },
-    businessIdeas: {
-      title: "ट्रेंडिंग बिजनेस आइडियाज",
-      subtitle: "अवसरों की खोज करें",
-      ideas: [
-        {
-          title: "डिजिटल मार्केटिंग",
-          description: "अपनी डिजिटल मार्केटिंग एजेंसी शुरू करें",
-          icon: "📱",
-        },
-        {
-          title: "ई-लर्निंग प्लेटफॉर्म",
-          description: "ऑनलाइन कोर्स बनाएं और बेचें",
-          icon: "🎓",
-        },
-        {
-          title: "फिनटेक सॉल्यूशंस",
-          description: "वित्तीय तकनीक उत्पाद विकसित करें",
-          icon: "💳",
-        },
-        {
-          title: "ग्रीन बिजनेस",
-          description: "स्थायी और पर्यावरण अनुकूल उद्यम",
-          icon: "🌱",
-        },
-        {
-          title: "हेल्थ टेक",
-          description: "स्वास्थ्य तकनीक समाधान",
-          icon: "⚕️",
-        },
-        {
-          title: "ई-कॉमर्स",
-          description: "ऑनलाइन खुदरा और मार्केटप्लेस",
-          icon: "🛍️",
-        },
-      ],
-    },
   },
 };
 
 const SuccessStoryTimeline = ({ steps }) => {
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12">
+    <div className="max-w-6xl mx-auto px-4 py-12 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl">
       {steps.map((step, index) => (
         <div
           key={index}
@@ -485,74 +405,6 @@ const SuccessStoryTimeline = ({ steps }) => {
   );
 };
 
-const BusinessIdeasScroll = ({ ideas }) => {
-  const scrollContainerRef = useRef(null);
-
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    const scrollAmount = 4; // Increased scroll speed
-    let scrollInterval;
-
-    if (container) {
-      scrollInterval = setInterval(() => {
-        container.scrollBy({
-          left: scrollAmount,
-          behavior: "auto", // Changed to auto for smoother continuous scrolling
-        });
-
-        // Reset scroll position to the start if at the end
-        if (
-          container.scrollLeft + container.clientWidth >=
-          container.scrollWidth
-        ) {
-          container.scrollTo({ left: 0 });
-        }
-      }, 20); // Reduced interval for smoother animation
-    }
-
-    return () => clearInterval(scrollInterval);
-  }, []);
-
-  return (
-    <div className="relative max-w-7xl mx-auto">
-      {/* Left blur gradient */}
-      <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-br from-green-50 to-white z-10"></div>
-
-      <div
-        ref={scrollContainerRef}
-        className="flex overflow-x-auto hide-scrollbar gap-6 px-12 py-6 scroll-smooth"
-        style={{
-          scrollbarWidth: "none",
-          msOverflowStyle: "none",
-          WebkitOverflowScrolling: "touch",
-          maskImage:
-            "linear-gradient(to right, transparent, black 15%, black 85%, transparent)",
-          WebkitMaskImage:
-            "linear-gradient(to right, transparent, black 15%, black 85%, transparent)",
-        }}
-      >
-        {/* Double the items for seamless infinite scroll */}
-        {[...ideas, ...ideas].map((idea, index) => (
-          <div
-            key={index}
-            className="flex-none w-72 bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-          >
-            <span className="text-4xl mb-4 block">{idea.icon}</span>
-            <h3 className="text-xl font-bold text-green-800 mb-2 flex items-center justify-center gap-2">
-              {idea.title}
-              <ArrowUpRight className="h-4 w-4" />
-            </h3>
-            <p className="text-green-600 text-center">{idea.description}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Right blur gradient */}
-      <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-white to-transparent z-10"></div>
-    </div>
-  );
-};
-
 
 const LandingPage = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -581,19 +433,9 @@ const LandingPage = () => {
      <Features t={t.features} />
         <section className="py-12 bg-white text-center">
           <h2 className="text-2xl font-bold text-green-800">
-            {t.businessIdeas.title}
-          </h2>
-          <p className="mt-2 text-green-600">{t.businessIdeas.subtitle}</p>
-          <BusinessIdeasScroll ideas={t.businessIdeas.ideas} />
-        </section>
-        
-        <section className="py-12 bg-gradient-to-br from-green-100 to-green-50">
-          <h2 className="text-2xl font-bold text-green-800 text-center">
             {t.successStories.title}
           </h2>
-          <p className="mt-2 text-green-600 text-center">
-            {t.successStories.subtitle}
-          </p>
+          <p className="mt-2 text-green-600">{t.successStories.subtitle}</p>
           <SuccessStoryTimeline steps={t.successStories.steps} />
         </section>
      
