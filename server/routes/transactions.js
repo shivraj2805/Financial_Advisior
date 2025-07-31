@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const transactionController = require('../controllers/transactionController');
+const ensureAuthenticated = require('../middlewares/Auth');
 
 // Middleware for logging requests
 const requestLogger = (req, res, next) => {
@@ -14,16 +15,19 @@ const requestLogger = (req, res, next) => {
 // Apply logging middleware to all routes
 router.use(requestLogger);
 
-// GET /api/transactions - Get all transactions
+// Apply authentication middleware to all transaction routes
+router.use(ensureAuthenticated);
+
+// GET /api/transactions - Get all transactions for authenticated user
 router.get('/', transactionController.getTransactions);
 
-// POST /api/transactions - Add a new transaction
+// POST /api/transactions - Add a new transaction for authenticated user
 router.post('/', transactionController.addTransaction);
 
-// DELETE /api/transactions/:id - Delete a transaction
+// DELETE /api/transactions/:id - Delete a transaction (only if it belongs to authenticated user)
 router.delete('/:id', transactionController.deleteTransaction);
 
-// GET /api/transactions/stats - Get transaction statistics
+// GET /api/transactions/stats - Get transaction statistics for authenticated user
 router.get('/stats', transactionController.getTransactionStats);
 
 // Error handling middleware for this router
