@@ -34,6 +34,7 @@ import FinancialAdvisorChatbotUi from "./Pages/financialAdvisiorChatBotUi";
 import LandingPage from "./LandingPage/Landingpage";  
 
 import ExpenseTracker from "./Pages/ExpenseTracker"; // Adjust the path based on your file structure
+import ScamsPage from "./Pages/ScamsPage";
 
 function App() {
   return (
@@ -75,6 +76,8 @@ function App() {
         <Route path="/ocr" element={<ProtectedRoute><DocOCR /></ProtectedRoute>} />
 
          <Route path="/expenses" element={<ProtectedRoute><ExpenseTracker /></ProtectedRoute>} />
+
+         <Route path="/scams" element={<ProtectedRoute><ScamsPage /></ProtectedRoute>} />
 
         <Route path="*" element={<ErrorPage />} />
       </Routes>

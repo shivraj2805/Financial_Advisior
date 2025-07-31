@@ -209,11 +209,17 @@ const translations = {
           icon: Receipt,
         },
         {
-          title: "Security Checker", 
-          description: "Verify the security of financial websites and protect yourself from online fraud",
-          link: "/securitycheck",
+          title: "Financial Scams", 
+          description: "Learn financial scams through interactive visulisations",
+          link: "/scams",
           icon: Shield,
         },
+        // {
+        //   title: "Security Checker", 
+        //   description: "Verify the security of financial websites and protect yourself from online fraud",
+        //   link: "/securitycheck",
+        //   icon:Shield ,
+        // },
 
         {
           title: "Fun And Learn", 
